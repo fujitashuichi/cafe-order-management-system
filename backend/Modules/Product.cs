@@ -1,4 +1,5 @@
-using System;
+namespace backend.Modules;
+
 using System.Text.Json.Serialization;
 
 public class Product

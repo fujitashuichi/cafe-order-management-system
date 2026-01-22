@@ -14,13 +14,8 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<Category>()
-            .HasMany(c => c.Product)
+            .HasMany(c => c.Products)
             .WithOne(p => p.Category)
-            .HasForeignKey(c => c.Id);
-
-        modelBuilder.Entity<Product>()
-            .HasOne(p => p.Category)
-            .WithMany(c => c.Product)
             .HasForeignKey(p => p.CategoryId);
     }
 }

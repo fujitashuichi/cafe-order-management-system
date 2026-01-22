@@ -8,6 +8,10 @@ builder.Services.AddCors(options =>
         policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
     });
 });
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlite("Data Source=cafe.db");
+});
 
 var app = builder.Build();
 app.UseCors();

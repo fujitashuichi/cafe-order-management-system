@@ -12,10 +12,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlite("Data Source=cafe.db");
 });
+builder.Services.AddControllers();
 
 var app = builder.Build();
 app.UseCors();
 
-app.MapGet("/", () => {});
+app.MapControllers();
 
 app.Run();

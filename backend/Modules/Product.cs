@@ -11,5 +11,5 @@ public class Product
 
     public int? CategoryId { get; set; }
     [JsonIgnore]
-    public Category Category { get; set; } = null!;
+    public Category? Category { get; set; }
 }

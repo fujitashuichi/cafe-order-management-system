@@ -1,7 +1,9 @@
 export type PortContextType = { frontend: string, backend: string };
 
 export type Product = {
-    id: number;
+    id: string;
     name: string;
     price: number;
+    image: string | null;
+    categoryId: number;
 };

@@ -20,4 +20,28 @@ public class ProductsController : ControllerBase
     {
         return await _context.Products.ToListAsync();
     }
+
+    [HttpPost]
+    public async Task<IResult> AddProducts(Product product)
+    {
+        try {
+            if (product.Id == Guid.Empty)
+            {
+                product.Id = Guid.NewGuid();
+            }
+            if (product.CategoryId == 0)
+            {
+                product.CategoryId = 1;
+            }
+
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+
+            return Results.Ok("商品登録完了: " + product);
+        } catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return Results.InternalServerError("商品登録失敗: " + ex.Message);
+        }
+    }
 }

@@ -7,3 +7,9 @@ export type Product = {
     image: string | null;
     categoryId: number;
 };
+
+export type Category = {
+    id: number;
+    name: string;
+    products: Product[];
+}

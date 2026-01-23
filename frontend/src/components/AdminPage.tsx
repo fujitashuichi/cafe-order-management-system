@@ -72,27 +72,31 @@ function AdminPage() {
     const addCategory = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const foundCategory = categories.find(item => item.name == inputCategoryName);
+        if (!inputCategoryName) {
+            alert("カテゴリーを追加するにはカテゴリー名を入力してください");
+            return;
+        }
+        if (categories.some(item => item.name == inputCategoryName)) {
+            alert("そのカテゴリーは既に登録されています");
+            return;
+        };
 
-        if (foundCategory) {
-            setCategoryId(foundCategory.id);
-        } else {
-            try {
-                const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(inputCategoryName)
-                });
+        try {
+            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: inputCategoryName })
+            });
 
-                if (response.ok) {
-                    setCategories([...categories, await response.json()])
-                    alert("新しいカテゴリーを追加しました");
-                }
-            }catch (err) {
-                console.error(err);
+            if (response.ok) {
+                setCategories([...categories, await response.json()]);
+                alert("新しいカテゴリーを追加しました");
+                setInputCategoryName("");
             }
+        }catch (err) {
+            console.error(err);
         }
     };
 

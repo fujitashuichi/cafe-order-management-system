@@ -17,5 +17,18 @@ public class AppDbContext : DbContext
             .HasMany(c => c.Products)
             .WithOne(p => p.Category)
             .HasForeignKey(p => p.CategoryId);
+
+        modelBuilder.Entity<Category>()
+            .HasData(
+                new Category { Id = 1, Name = "その他" }
+            );
+
+        modelBuilder.Entity<Product>()
+            .HasData(
+                new Product { Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), Name = "ブレンドコーヒー", Price = 450, CategoryId = 1 },
+                new Product { Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), Name = "カフェラテ", Price = 500, CategoryId = 1 }
+            );
+
+
     }
 }

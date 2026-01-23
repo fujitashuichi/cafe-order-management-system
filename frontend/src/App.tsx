@@ -15,18 +15,18 @@ function App() {
 			.then(res => res.json())
 			.then(data => setProducts(data))
 			.catch(err => console.error("通信失敗:", err));
-	} ,[]);
+	} ,[backendPort]);
 
 	return (
 		<>
 			<h2>Products</h2>
 			<dl>
-				{products.map((item, index) => {
+				{products.map((item, index) =>
 					<div key={index}>
 						<dt>{item.name}</dt>
 						<dd>{item.price}</dd>
 					</div>
-				})}
+				)}
 			</dl>
 		</>
 	)

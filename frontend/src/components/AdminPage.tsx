@@ -12,20 +12,31 @@ function AdminPage() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
 
-    // DBからカテゴリーをすべて取得し、setCategoriesまで実行してくれる関数
-    const fetchCategories = async (): Promise<void> => {
-        const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        setCategories(await response.json());
-    };
+    const [products, setProducts] = useState<Product[]>([]);
 
     useEffect(() => {
+        const fetchCategories = async (): Promise<void> => {
+            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            setCategories(await response.json());
+        };
+        const fetchProducts = async (): Promise<void> => {
+            const response = await fetch(`http://localhost:${backendPort}/api/products`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            setProducts(await response.json());
+        }
+
         const fetchData = async () => {
             await fetchCategories();
+            await fetchProducts();
         };
         fetchData();
     }, [backendPort]);
@@ -62,6 +73,7 @@ function AdminPage() {
 
         if (response.ok) {
             alert("商品を登録しました");
+            setProducts([...products, await response.json()]);
             setName("");
             setPrice("-1");
         }
@@ -125,6 +137,26 @@ function AdminPage() {
                 <input id="newCategory" type="text" minLength={1} maxLength={15} value={inputCategoryName || ""} placeholder="15文字以内" onChange={(e) => setInputCategoryName(e.target.value)} />
                 <button type="submit" onClick={(e) => addCategory(e)}>追加</button>
             </form>
+            <div style={{ maxHeight: "900px", overflowY: "auto" }}>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品名</th>
+                            <th>値段</th>
+                            <th>カテゴリー</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {products.map(item =>
+                            <tr key={item.id}>
+                                <td>{item.name}</td>
+                                <td>{item.price}</td>
+                                <td>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     )
 }

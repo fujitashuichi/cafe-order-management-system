@@ -37,11 +37,31 @@ public class ProductsController : ControllerBase
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            return Results.Ok("商品登録完了: " + product);
+            return Results.Ok(product);
         } catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
             return Results.InternalServerError("商品登録失敗: " + ex.Message);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IResult> DeleteProduct(Guid id)
+    {
+        try
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product is null)
+            {
+                return Results.NotFound("削除しようとした商品は存在しません");
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return Results.NoContent();
+        } catch (Exception ex)
+        {
+            return Results.InternalServerError("商品の削除に失敗しました" + ex.Message);
         }
     }
 }

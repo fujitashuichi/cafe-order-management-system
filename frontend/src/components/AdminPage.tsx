@@ -112,6 +112,37 @@ function AdminPage() {
         }
     };
 
+    const deleteProduct = async (e: React.FormEvent, id: Product["id"]) => {
+        e.preventDefault();
+
+        const product = products.find(item => item.id = id);
+        if (!product) {
+            alert("! 削除する商品が見つかりません。再読み込みを試しても解決しない場合、開発者に連絡してください");
+            return;
+        }
+        const result = window.confirm(`本当に${product.name}を削除しますか?`);
+        if (!result) return;
+
+        try {
+            const response = await fetch(`http://localhost:${backendPort}/api/products/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(id)
+            });
+
+            if (response.ok) {
+                alert("正常に削除されました");
+                setProducts(prevProducts => prevProducts.filter(p => p.id !== id));
+                // prev: previous (以前の) の意味で、更新前の値などに使う
+            }
+        } catch (err) {
+            alert("商品の削除に失敗しました");
+            console.error("商品の削除に失敗: ", err);
+        }
+    };
+
     return (
         <div style={{ padding: "20px", border: "1px solid #ccc" }}>
             <h2>管理者用：商品登録</h2>
@@ -132,7 +163,7 @@ function AdminPage() {
                 </div>
                 <button type="submit">登録</button>
             </form>
-            <form action="">
+            <form action="" style={{ marginBottom: "50px" }}>
                 <label htmlFor="newCategory">新しいカテゴリを追加する</label>
                 <input id="newCategory" type="text" minLength={1} maxLength={15} value={inputCategoryName || ""} placeholder="15文字以内" onChange={(e) => setInputCategoryName(e.target.value)} />
                 <button type="submit" onClick={(e) => addCategory(e)}>追加</button>
@@ -149,9 +180,12 @@ function AdminPage() {
                     <tbody>
                         {products.map(item =>
                             <tr key={item.id}>
-                                <td>{item.name}</td>
-                                <td>{item.price}</td>
-                                <td>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
+                                <td style={{ padding: "10px" }}>{item.name}</td>
+                                <td style={{ padding: "10px" }}>{item.price}</td>
+                                <td style={{ padding: "10px" }}>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
+                                <td>
+                                    <button id={item.id} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteProduct(e, item.id)}>削除</button>
+                                </td>
                             </tr>
                         )}
                     </tbody>

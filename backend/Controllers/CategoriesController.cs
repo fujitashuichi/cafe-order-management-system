@@ -45,4 +45,26 @@ public class CategoriesController : ControllerBase
             return Results.InternalServerError("カテゴリー名の登録に失敗: " + ex.Message);
         }
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IResult> DeleteCategory(int id)
+    {
+        try {
+            var category = await _context.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
+            if (category is null) return Results.NotFound();
+
+            if (category.Products.Any())
+            {
+                return Results.BadRequest("商品が紐ずけられているため、カテゴリーを削除できません。");
+            }
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return Results.NoContent();
+        } catch (Exception ex)
+        {
+            return Results.InternalServerError(ex.Message);
+        }
+
+    }
 }

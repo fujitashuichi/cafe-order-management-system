@@ -115,7 +115,7 @@ function AdminPage() {
     const deleteProduct = async (e: React.FormEvent, id: Product["id"]) => {
         e.preventDefault();
 
-        const product = products.find(item => item.id = id);
+        const product = products.find(item => item.id === id);
         if (!product) {
             alert("! 削除する商品が見つかりません。再読み込みを試しても解決しない場合、開発者に連絡してください");
             return;

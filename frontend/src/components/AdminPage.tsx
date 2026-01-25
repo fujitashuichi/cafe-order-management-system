@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import type { Category, Product } from "../types/Types";
 import { usePorts } from "../contexts/PortContext";
+import EditProductModal from "./EditProductModal";
 
 
 function AdminPage() {
@@ -13,6 +14,8 @@ function AdminPage() {
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
 
     const [products, setProducts] = useState<Product[]>([]);
+
+    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     useEffect(() => {
         const fetchCategories = async (): Promise<void> => {
@@ -42,7 +45,7 @@ function AdminPage() {
     }, [backendPort]);
 
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const addProduct = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!name) {
@@ -79,37 +82,10 @@ function AdminPage() {
         }
     };
 
-
-    // カテゴリーを追加するだけで、登録手順には影響を与えない
-    const addCategory = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!inputCategoryName) {
-            alert("カテゴリーを追加するにはカテゴリー名を入力してください");
-            return;
-        }
-        if (categories.some(item => item.name == inputCategoryName)) {
-            alert("そのカテゴリーは既に登録されています");
-            return;
-        };
-
-        try {
-            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name: inputCategoryName })
-            });
-
-            if (response.ok) {
-                setCategories([...categories, await response.json()]);
-                alert("新しいカテゴリーを追加しました");
-                setInputCategoryName("");
-            }
-        }catch (err) {
-            console.error(err);
-        }
+    const handleUpdateCompleted = (updated: Product) => {
+        setProducts(products.map(p => p.id === updated.id ? updated : p));
+        setEditingProduct(null);
+        alert("更新が完了しました");
     };
 
     const deleteProduct = async (e: React.FormEvent, id: Product["id"]) => {
@@ -140,6 +116,38 @@ function AdminPage() {
         } catch (err) {
             alert("商品の削除に失敗しました");
             console.error("商品の削除に失敗: ", err);
+        }
+    };
+
+
+    const addCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!inputCategoryName) {
+            alert("カテゴリーを追加するにはカテゴリー名を入力してください");
+            return;
+        }
+        if (categories.some(item => item.name == inputCategoryName)) {
+            alert("そのカテゴリーは既に登録されています");
+            return;
+        };
+
+        try {
+            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: inputCategoryName })
+            });
+
+            if (response.ok) {
+                setCategories([...categories, await response.json()]);
+                alert("新しいカテゴリーを追加しました");
+                setInputCategoryName("");
+            }
+        }catch (err) {
+            console.error(err);
         }
     };
 
@@ -179,8 +187,8 @@ function AdminPage() {
 
     return (
         <div style={{ padding: "20px", border: "1px solid #ccc" }}>
-            <h2>管理者用：商品登録</h2>
-            <form onSubmit={handleSubmit}>
+            <h2>商品登録</h2>
+            <form onSubmit={addProduct}>
                 <div>
                     <label htmlFor="name">商品名: </label>
                     <input key="name" value={name} onChange={e => setName(e.target.value)} />
@@ -213,11 +221,14 @@ function AdminPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {products.map(item =>
+                        {products.map((item: Product) =>
                             <tr key={item.id}>
                                 <td style={{ padding: "10px" }}>{item.name}</td>
                                 <td style={{ padding: "10px" }}>{item.price}</td>
                                 <td style={{ padding: "10px" }}>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
+                                <td>
+                                    <button id={item.id} type="submit" style={{ color: "#ccc", marginLeft: "10px" }} onClick={() => setEditingProduct(item)}>編集</button>
+                                </td>
                                 <td>
                                     <button id={item.id} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteProduct(e, item.id)}>削除</button>
                                 </td>
@@ -237,7 +248,7 @@ function AdminPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {categories.map(item =>
+                        {categories.map((item: Category) =>
                             <tr key={item.id}>
                                 <td style={{ padding: "10px" }}>{item.name}</td>
                                 <td style={{ padding: "10px" }}>{item.hasProducts ? "○" : "×"}</td>
@@ -250,6 +261,16 @@ function AdminPage() {
                     </tbody>
                 </table>
             </div>
+
+            {editingProduct && (
+                <EditProductModal
+                    product={editingProduct}
+                    categories={categories}
+                    onClose={() => {setEditingProduct(null)}}
+                    onUpdate={(product) => handleUpdateCompleted(product)}
+                    backendPort={backendPort}
+                />
+            )}
         </div>
     )
 }

@@ -64,4 +64,24 @@ public class ProductsController : ControllerBase
             return Results.InternalServerError("商品の削除に失敗しました" + ex.Message);
         }
     }
+
+    [HttpPut("{id}")]
+    public async Task<IResult> UpdateProduct(Guid id, [FromBody] Product dto)
+    {
+        var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        if (product is null) return Results.NotFound("編集しようとしている商品が見つかりません");
+
+        product.Name = dto.Name;
+        product.Price = dto.Price;
+        product.CategoryId = dto.CategoryId;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return Results.Ok(product);
+        } catch (Exception ex)
+        {
+            return Results.InternalServerError(ex.Message);
+        }
+    }
 }

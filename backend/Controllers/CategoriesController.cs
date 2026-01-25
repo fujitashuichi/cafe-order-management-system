@@ -65,6 +65,5 @@ public class CategoriesController : ControllerBase
         {
             return Results.InternalServerError(ex.Message);
         }
-
     }
 }

@@ -143,6 +143,40 @@ function AdminPage() {
         }
     };
 
+    const deleteCategory = async (e: React.FormEvent, id: Category["id"]) => {
+        e.preventDefault();
+
+        const category = categories.find(item => item.id === id);
+        if (!category) {
+            alert("! 削除するカテゴリーが見つかりません。再読み込みを試しても解決しない場合、開発者に連絡してください");
+            return;
+        }
+        const result = window.confirm(`本当に${category.name}を削除しますか?`);
+        if (!result) return;
+
+        try {
+            const response = await fetch(`http://localhost:${backendPort}/api/categories/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(id)
+            });
+
+            if (response.status == 400) {
+                alert("商品が紐ずいているため、削除できません");
+            }
+
+            if (response.ok) {
+                alert("正常に削除されました");
+                setCategories(prevCategories => prevCategories.filter(c => c.id !== id));
+            }
+        } catch (err) {
+            alert("商品の削除に失敗しました");
+            console.error("商品の削除に失敗: ", err);
+        }
+    };
+
     return (
         <div style={{ padding: "20px", border: "1px solid #ccc" }}>
             <h2>管理者用：商品登録</h2>
@@ -169,6 +203,7 @@ function AdminPage() {
                 <button type="submit" onClick={(e) => addCategory(e)}>追加</button>
             </form>
             <div style={{ maxHeight: "900px", overflowY: "auto" }}>
+                <h2>商品一覧</h2>
                 <table>
                     <thead>
                         <tr>
@@ -185,6 +220,30 @@ function AdminPage() {
                                 <td style={{ padding: "10px" }}>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
                                 <td>
                                     <button id={item.id} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteProduct(e, item.id)}>削除</button>
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            <div style={{ maxHeight: "900px", overflowY: "auto" }}>
+                <h2>カテゴリー一覧</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>カテゴリー名</th>
+                            <th>商品の有無</th>
+                            <th>商品数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {categories.map(item =>
+                            <tr key={item.id}>
+                                <td style={{ padding: "10px" }}>{item.name}</td>
+                                <td style={{ padding: "10px" }}>{item.hasProducts ? "○" : "×"}</td>
+                                <td style={{ padding: "10px" }}>{item.products.length}</td>
+                                <td>
+                                    <button id={String(item.id)} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteCategory(e, item.id)}>削除</button>
                                 </td>
                             </tr>
                         )}

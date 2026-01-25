@@ -14,6 +14,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 builder.Services.AddControllers();
 
+// JSON送信時の循環参照を無視
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
+
 var app = builder.Build();
 app.UseCors();
 

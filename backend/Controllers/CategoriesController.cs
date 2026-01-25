@@ -18,7 +18,7 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
     {
-        return await _context.Categories.ToListAsync();
+        return await _context.Categories.Include(c => c.Products).ToListAsync();
     }
 
     [HttpPost]
@@ -53,7 +53,7 @@ public class CategoriesController : ControllerBase
             var category = await _context.Categories.Include(c => c.Products).FirstOrDefaultAsync(c => c.Id == id);
             if (category is null) return Results.NotFound();
 
-            if (category.Products.Any())
+            if (category.Products.Count != 0)
             {
                 return Results.BadRequest("商品が紐ずけられているため、カテゴリーを削除できません。");
             }

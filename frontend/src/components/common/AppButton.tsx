@@ -3,14 +3,12 @@ import React from 'react'
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     children: React.ReactNode;
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-    type: "button" | "submit";
     variant: "primary" | "danger" | "secondary";
     className?: string;
 }
 
 
-function AppButton({ children, onClick, type = "button", variant = "primary", className = "", ...rest }: ButtonProps) {
+function AppButton({ children, variant = "primary", className, ...rest }: ButtonProps) {
     const baseStyle = "font-bold py-2 px-4 rounded transition duration-200";
     const variants = {
         primary: "bg-blue-600 hover:bg-blue-800 text-white",
@@ -19,7 +17,7 @@ function AppButton({ children, onClick, type = "button", variant = "primary", cl
     };
 
     return (
-        <button type={type} className={`${baseStyle} ${variants[variant]} ${className}`} onClick={onClick} {...rest}>
+        <button className={`${baseStyle} ${variants[variant]} ${className}`} {...rest}>
             {children}
         </button>
     )

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import type { Category, Product } from "../types/Types";
 import { usePorts } from "../contexts/PortContext";
 import EditProductModal from "./EditProductModal";
+import AppButton from "./common/AppButton";
 
 
 function AdminPage() {
@@ -227,10 +228,10 @@ function AdminPage() {
                                 <td className="p-2.5 text-center">{item.price.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}</td>
                                 <td className="p-2.5 text-center">{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
                                 <td>
-                                    <button className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-200" id={item.id} type="button" onClick={() => setEditingProduct(item)}>編集</button>
+                                    <AppButton id={item.id} type="button" variant="primary" onClick={() => setEditingProduct(item)}>編集</AppButton>
                                 </td>
                                 <td>
-                                    <button className="bg-gray-200 hover:bg-gray-400 text-red-600 ml-5 font-bold py-2 px-4 rounded transition duration-200" id={item.id} type="button" onClick={(e) => deleteProduct(e, item.id)}>削除</button>
+                                    <AppButton id={item.id} type="button" variant="danger" onClick={(e) => deleteProduct(e, item.id)}>削除</AppButton>
                                 </td>
                             </tr>
                         )}
@@ -254,7 +255,7 @@ function AdminPage() {
                                 <td className="p-2.5 text-center">{item.hasProducts ? "○" : "×"}</td>
                                 <td className="p-2.5 text-center">{item.products.length}</td>
                                 <td>
-                                    <button className="bg-gray-200 hover:bg-gray-400 text-red-600 ml-5 font-bold py-2 px-4 rounded transition duration-200"  id={String(item.id)} type="submit" onClick={(e) => deleteCategory(e, item.id)}>削除</button>
+                                    <AppButton id={String(item.id)} type="submit" variant="danger" onClick={(e) => deleteCategory(e, item.id)}>削除</AppButton>
                                 </td>
                             </tr>
                         )}

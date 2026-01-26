@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Category, Product } from "../types/Types"
+import AppButton from "./common/AppButton";
 
 type EditModalProps = {
     product: Product;
@@ -31,31 +32,28 @@ function EditProductModal({ product, categories, onClose, onUpdate, backendPort 
     }
 
     return (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center'
-        }}>
-            <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', minWidth: '300px' }}>
-                <h3>商品情報を編集</h3>
-                <form onSubmit={(e) => handleSubmit(e)}>
-                    <strong>{product.name}を編集</strong>
+        <div className="fixed top-0 left-0 w-full h-full bg-black/10 flex items-center justify-center z-50">
+            <div className="bg-white p-5 rounded-b-lg rounded-t-lg min-w-80 w-fit h-fit">
+                <h2 className="text-2xl mb-5 text-red-500">商品情報を編集</h2>
+                <form className="flex flex-col justify-center items-center" onSubmit={(e) => handleSubmit(e)}>
+                    <p className="mb-5"><b>{product.name}</b> を編集</p>
                     <div>
                         <label htmlFor="name">名前: </label>
-                        <input id="name" type="text" minLength={1} maxLength={15} value={name} onChange={(e) => setName(e.target.value)} />
+                        <input className="border border-gray-300 rounded" id="name" type="text" minLength={1} maxLength={15} value={name} onChange={(e) => setName(e.target.value)} />
                     </div>
                     <div>
                         <label htmlFor="price">値段: </label>
-                        <input id="price" type="number" min={0} max={10000000} value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} />
+                        <input className="border border-gray-300 rounded" id="price" type="number" min={0} max={10000000} value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} />
                     </div>
                     <div>
                         <label htmlFor="category">カテゴリー: </label>
-                        <select id="category" name="" onChange={(e) => setCategoryId(parseInt(e.target.value))}>
+                        <select className="border border-gray-300 rounded" id="category" name="" onChange={(e) => setCategoryId(parseInt(e.target.value))}>
                             {categories.map((item: Category) => { return (<option key={item.id} value={item.id}>{item.name}</option>) })}
                         </select>
                     </div>
                     <div style={{ marginTop: '10px' }}>
-                        <button type="submit">更新</button>
-                        <button type="button" onClick={onClose} style={{ marginLeft: '10px' }}>キャンセル</button>
+                        <AppButton type="submit" variant="primary">更新</AppButton>
+                        <AppButton type="button" variant="danger" onClick={onClose}>キャンセル</AppButton>
                     </div>
                 </form>
             </div>

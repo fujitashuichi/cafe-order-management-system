@@ -1,8 +1,24 @@
+@font-face {
+  font-family: 'Dancing Script';
+  src: url('./assets/fonts/DancingScript/DancingScript-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
 @import "tailwindcss";
+
+@theme {
+  --font-dancing: "Dancing Script", cursive;
+}
+
+:root {
+  --font-dancing: "Dancing Script", cursive;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif, var(--font-dancing);
+}
 
 /*
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
   line-height: 1.5;
   font-weight: 400;
 

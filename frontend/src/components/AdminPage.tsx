@@ -186,75 +186,75 @@ function AdminPage() {
     };
 
     return (
-        <div style={{ padding: "20px", border: "1px solid #ccc" }}>
-            <h2>商品登録</h2>
-            <form onSubmit={addProduct}>
-                <div>
+        <div className="p-5 border border-gray-300">
+            <h2 className="text-2xl">商品登録</h2>
+            <form className="border border-red-500 rounded p-5 w-fit mr-auto ml-auto" onSubmit={addProduct}>
+                <div className="text-left">
                     <label htmlFor="name">商品名: </label>
-                    <input key="name" value={name} onChange={e => setName(e.target.value)} />
+                    <input className="min-w-60 border border-gray-300 rounded" key="name" value={name} onChange={e => setName(e.target.value)} />
                 </div>
-                <div>
+                <div className="text-left">
                     <label htmlFor="price">価格: </label>
-                    <input key="price" type="number" min={0} max={10000000} value={price == "-1" ? "" : price} onChange={e => setPrice(e.target.value)} />
+                    <input className="w-20 border border-gray-300 rounded" key="price" type="number" min={0} max={10000000} value={price == "-1" ? "" : price} onChange={e => setPrice(e.target.value)} />
                 </div>
-                <div>
+                <div className="text-left">
                     <label htmlFor="category">カテゴリー: </label>
-                    <select key="category" onChange={(e) => {e.preventDefault(); setCategoryId(Number(e.target.value))}}>
+                    <select className="w-20 border border-gray-300 rounded" key="category" onChange={(e) => {e.preventDefault(); setCategoryId(Number(e.target.value))}}>
                         {categories.map(category => { return (<option key={category.id} value={category.id}>{category.name}</option>) })}
                     </select>
                 </div>
-                <button type="submit">登録</button>
+                <button className="bg-blue-600 hover:bg-blue-800 text-white font-bold mt-6 py-2 px-4 rounded transition duration-200" type="submit">登録</button>
             </form>
-            <form action="" style={{ marginBottom: "50px" }}>
-                <label htmlFor="newCategory">新しいカテゴリを追加する</label>
-                <input id="newCategory" type="text" minLength={1} maxLength={15} value={inputCategoryName || ""} placeholder="15文字以内" onChange={(e) => setInputCategoryName(e.target.value)} />
-                <button type="submit" onClick={(e) => addCategory(e)}>追加</button>
+            <form className="mt-5" onSubmit={(e) => addCategory(e)}>
+                <label className="text-orange-500 text-2xs" htmlFor="newCategory">新しいカテゴリを追加する: </label>
+                <input className="border border-gray-300 rounded" id="newCategory" type="text" minLength={1} maxLength={15} value={inputCategoryName || ""} placeholder="15文字以内" onChange={(e) => setInputCategoryName(e.target.value)} />
+                <button className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-200" type="submit">追加</button>
             </form>
-            <div style={{ maxHeight: "900px", overflowY: "auto" }}>
-                <h2>商品一覧</h2>
-                <table>
-                    <thead>
+            <div className="max-h-screen mt-20" style={{ maxHeight: "900px", overflowY: "auto" }}>
+                <h2 className="text-2xl">商品一覧</h2>
+                <table className="min-w-full divide-y divide-gray-200 shadow-sm rounded-lg overflow-y-auto">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <th>商品名</th>
-                            <th>値段</th>
-                            <th>カテゴリー</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">商品名</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">値段</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">カテゴリー</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-white divide-y divide-gray-200">
                         {products.map((item: Product) =>
                             <tr key={item.id}>
-                                <td style={{ padding: "10px" }}>{item.name}</td>
-                                <td style={{ padding: "10px" }}>{item.price}</td>
-                                <td style={{ padding: "10px" }}>{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
+                                <td className="p-2.5 text-center">{item.name}</td>
+                                <td className="p-2.5 text-center">{item.price.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}</td>
+                                <td className="p-2.5 text-center">{categories.find(category => category.id == item.categoryId)?.name || "未分類"}</td>
                                 <td>
-                                    <button id={item.id} type="submit" style={{ color: "#ccc", marginLeft: "10px" }} onClick={() => setEditingProduct(item)}>編集</button>
+                                    <button className="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-200" id={item.id} type="button" onClick={() => setEditingProduct(item)}>編集</button>
                                 </td>
                                 <td>
-                                    <button id={item.id} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteProduct(e, item.id)}>削除</button>
+                                    <button className="bg-gray-200 hover:bg-gray-400 text-red-600 ml-5 font-bold py-2 px-4 rounded transition duration-200" id={item.id} type="button" onClick={(e) => deleteProduct(e, item.id)}>削除</button>
                                 </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
             </div>
-            <div style={{ maxHeight: "900px", overflowY: "auto" }}>
-                <h2>カテゴリー一覧</h2>
-                <table>
-                    <thead>
+            <div className="max-h-80 overflow-y-auto mt-20">
+                <h2 className="text-2xl">カテゴリー一覧</h2>
+                <table className="w-full divide-y divide-gray-200 shadow-sm rounded-lg overflow-y-auto">
+                    <thead className="bg-gray-50">
                         <tr>
-                            <th>カテゴリー名</th>
-                            <th>商品の有無</th>
-                            <th>商品数</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">カテゴリー名</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">商品の有無</th>
+                            <th className="px-6 py-3 text-center text-2xs font-medium text-gray-500 uppercase tracking-wider">商品数</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="bg-white divide-y divide-gray-200">
                         {categories.map((item: Category) =>
                             <tr key={item.id}>
-                                <td style={{ padding: "10px" }}>{item.name}</td>
-                                <td style={{ padding: "10px" }}>{item.hasProducts ? "○" : "×"}</td>
-                                <td style={{ padding: "10px" }}>{item.products.length}</td>
+                                <td className="p-2.5 text-center">{item.name}</td>
+                                <td className="p-2.5 text-center">{item.hasProducts ? "○" : "×"}</td>
+                                <td className="p-2.5 text-center">{item.products.length}</td>
                                 <td>
-                                    <button id={String(item.id)} type="submit" style={{ color: "#ff0000", marginLeft: "20px" }} onClick={(e) => deleteCategory(e, item.id)}>削除</button>
+                                    <button className="bg-gray-200 hover:bg-gray-400 text-red-600 ml-5 font-bold py-2 px-4 rounded transition duration-200"  id={String(item.id)} type="submit" onClick={(e) => deleteCategory(e, item.id)}>削除</button>
                                 </td>
                             </tr>
                         )}

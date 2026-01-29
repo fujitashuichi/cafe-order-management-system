@@ -1,5 +1,3 @@
-export type PortContextType = { frontend: string, backend: string };
-
 export type Product = {
     id: string;
     name: string;

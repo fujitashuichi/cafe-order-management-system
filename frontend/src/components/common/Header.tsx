@@ -39,9 +39,15 @@ function Header() {
 
                     <nav className={`${baseNav} ${mobileNav} ${desktopNav}`}>
                         <ul className="flex flex-col p-10 pt-20 space-y-6 md:flex-row md:p-0 md:pt-0 md:space-y-0 md:h-full md:gap-x-8">
-                            <li className="hover:text-stone-900 cursor-pointer">Menu</li>
-                            <li className="hover:text-stone-900 cursor-pointer">About</li>
-                            <li className="hover:text-stone-900 cursor-pointer">Access</li>
+                            <li className="hover:text-stone-900 cursor-pointer">
+                                <Link to="/">Menu</Link>
+                            </li>
+                            <li className="hover:text-stone-900 cursor-pointer">
+                                <a href="#about">About</a>
+                            </li>
+                            <li className="hover:text-stone-900 cursor-pointer">
+                                <a href="#access">Access</a>
+                            </li>
                             <li className="hover:text-stone-900 cursor-pointer text-blue-600">
                                 <Link to="/admin">Adminへ（開発用リンク）</Link>
                             </li>

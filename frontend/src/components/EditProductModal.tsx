@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Category, Product } from "../types/Types"
+import type { Category, Product } from "../types/types"
 import AppButton from "./common/AppButton";
 
 type EditModalProps = {

@@ -1,6 +1,13 @@
 import { createContext, useContext } from "react";
-import type { PortContextType } from "../types/Types";
+import type { PortContextType } from "../types/types.context";
 
-export const PortContext = createContext<PortContextType>({ frontend: "", backend: "" });
 
-export const usePorts = () => useContext(PortContext);
+export const PortContext = createContext<PortContextType | null>(null);
+
+export const usePorts = () => {
+    const ctx = useContext(PortContext);
+    if (ctx === null) {
+        throw new Error("Providerが設定されていません");
+    }
+    return ctx;
+}

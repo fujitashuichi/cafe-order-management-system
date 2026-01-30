@@ -3,20 +3,18 @@ import type { Category, Product } from "../types/types";
 import { usePorts } from "../contexts/PortContext";
 import EditProductModal from "./EditProductModal";
 import AppButton from "./common/AppButton";
+import { ProductServices } from "../services/ProductServices";
+import { useBaseUrl } from "../contexts/BaseUrlContext";
 
 
 function AdminPage() {
-    const { backend: backendPort } = usePorts();
-    const [name, setName] = useState<Product["name"]>("");
-    const [price, setPrice] = useState<string>("-1");
-    const [categoryId, setCategoryId] = useState<Product["categoryId"]>(1);
-    const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
+    const { backend: baseUrl } = useBaseUrl();
+    const { backend: port } = usePorts();
 
     const [categories, setCategories] = useState<Category[]>([]);
+    const [products, setProducts] = useState<Product[] | null>(null);
+
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
-
-    const [products, setProducts] = useState<Product[]>([]);
-
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     useEffect(() => {
@@ -29,25 +27,30 @@ function AdminPage() {
             });
             setCategories(await response.json());
         };
-        const fetchProducts = async (): Promise<void> => {
-            const response = await fetch(`http://localhost:${backendPort}/api/products`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            setProducts(await response.json());
-        }
+
+        const productServices = new ProductServices(`${baseUrl}${port}`);
 
         const fetchData = async () => {
-            await fetchCategories();
-            await fetchProducts();
+            const productResult = await productServices.fetchProducts();
+
+            if (!productResult.ok) {
+                throw productResult.error;
+            }
+            if (productResult.value === null) {
+                throw new Error("商品データが取得されていません");
+            }
+
+            setProducts(await productResult.value);
         };
         fetchData();
-    }, [backendPort]);
+    }, [baseUrl, port]);
 
 
+    // 以下、将来的にLoadingを導入 //
 
+    if (products === null) throw new Error("商品取得中です");
+
+    //  end Loading  //
 
 
     const handleUpdateCompleted = (updated: Product) => {
@@ -219,7 +222,7 @@ function AdminPage() {
                     categories={categories}
                     onClose={() => {setEditingProduct(null)}}
                     onUpdate={(product) => handleUpdateCompleted(product)}
-                    backendPort={backendPort}
+                    backendPort={port}
                 />
             )}
         </div>

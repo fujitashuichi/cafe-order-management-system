@@ -36,3 +36,7 @@
 # 2026-01-28
 * FEでServiceに通信処理を委託（Providerの肥大化を抑える）
 * ProductServicesを作成。
+
+# 2026-01-29
+* ProductServiceをクラス化 → ProductProviderのEffectフェーズとして利用。
+* 01/27の続き: AdminPageのProduct関連で、画面・ローディング状態以外の切り出しが完了。

@@ -1,60 +1,52 @@
 import { useEffect, useState } from "react"
 import type { Category, Product } from "../types/types";
 import { usePorts } from "../contexts/PortContext";
-import EditProductModal from "./EditProductModal";
-import AppButton from "./common/AppButton";
-import { ProductServices } from "../services/ProductServices";
 import { useBaseUrl } from "../contexts/BaseUrlContext";
+import { useProducts } from "../contexts/ProductsContext";
+import { useCategories } from "../contexts/CategoriesContext";
+import AppButton from "../components/common/AppButton"
+import EditProductModal from "./EditProductModal";
 
 
 function AdminPage() {
     const { backend: baseUrl } = useBaseUrl();
     const { backend: port } = usePorts();
 
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [products, setProducts] = useState<Product[] | null>(null);
+    const { products: products, loading: loadingProducts, reload: reloadProducts } = useProducts();
+    const { categories: categories, loading: loadingCategories, reload: reloadCategories } = useCategories();
 
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+
     useEffect(() => {
-        const fetchCategories = async (): Promise<void> => {
-            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            });
-            setCategories(await response.json());
-        };
+        reloadProducts();
+        reloadCategories();
+    }, []);
 
-        const productServices = new ProductServices(`${baseUrl}${port}`);
+    //  loading  //
 
-        const fetchData = async () => {
-            const productResult = await productServices.fetchProducts();
-
-            if (!productResult.ok) {
-                throw productResult.error;
-            }
-            if (productResult.value === null) {
-                throw new Error("商品データが取得されていません");
-            }
-
-            setProducts(await productResult.value);
-        };
-        fetchData();
-    }, [baseUrl, port]);
-
-
-    // 以下、将来的にLoadingを導入 //
-
-    if (products === null) throw new Error("商品取得中です");
+    if (loadingProducts) {
+        return(<h1>商品読み込み中...</h1>)
+    }
+    if (loadingCategories) {
+        return(<h1>商品カテゴリー読み込み中...</h1>)
+    }
 
     //  end Loading  //
 
+    if (products === null) {
+        <h1>Something went wrong</h1>
+        throw new Error("商品情報を取得していません");
+    }
+    if (categories === null) {
+        <h1>Something went wrong</h1>
+        throw new Error("カテゴリー情報を取得していません");
+    }
 
-    const handleUpdateCompleted = (updated: Product) => {
-        setProducts(products.map(p => p.id === updated.id ? updated : p));
+
+    const handleUpdateCompleted = () => {
+        reloadProducts();
         setEditingProduct(null);
         alert("更新が完了しました");
     };
@@ -71,7 +63,7 @@ function AdminPage() {
         if (!result) return;
 
         try {
-            const response = await fetch(`http://localhost:${backendPort}/api/products/${id}`, {
+            const response = await fetch(`${baseUrl}${port}/api/products/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
@@ -81,8 +73,7 @@ function AdminPage() {
 
             if (response.ok) {
                 alert("正常に削除されました");
-                setProducts(prevProducts => prevProducts.filter(p => p.id !== id));
-                // prev: previous (以前の) の意味で、更新前の値などに使う
+                reloadProducts();
             }
         } catch (err) {
             alert("商品の削除に失敗しました");
@@ -104,7 +95,7 @@ function AdminPage() {
         };
 
         try {
-            const response = await fetch(`http://localhost:${backendPort}/api/categories`, {
+            const response = await fetch(`${baseUrl}${port}/api/categories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -113,7 +104,7 @@ function AdminPage() {
             });
 
             if (response.ok) {
-                setCategories([...categories, await response.json()]);
+                reloadCategories();
                 alert("新しいカテゴリーを追加しました");
                 setInputCategoryName("");
             }
@@ -134,7 +125,7 @@ function AdminPage() {
         if (!result) return;
 
         try {
-            const response = await fetch(`http://localhost:${backendPort}/api/categories/${id}`, {
+            const response = await fetch(`${baseUrl}${port}/api/categories/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
@@ -148,7 +139,7 @@ function AdminPage() {
 
             if (response.ok) {
                 alert("正常に削除されました");
-                setCategories(prevCategories => prevCategories.filter(c => c.id !== id));
+                reloadCategories();
             }
         } catch (err) {
             alert("商品の削除に失敗しました");
@@ -221,7 +212,7 @@ function AdminPage() {
                     product={editingProduct}
                     categories={categories}
                     onClose={() => {setEditingProduct(null)}}
-                    onUpdate={(product) => handleUpdateCompleted(product)}
+                    onUpdate={() => handleUpdateCompleted()}
                     backendPort={port}
                 />
             )}

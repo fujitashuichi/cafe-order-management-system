@@ -3,7 +3,7 @@ import type { ProductContextType } from "../types/types.context";
 
 export const ProductsContext = createContext<ProductContextType | null>(null);
 
-export const useProducts = () => {
+export const useProducts = (): ProductContextType => {
     const ctx = useContext(ProductsContext);
     if (ctx === null) {
         throw new Error("Providerが設定されていません");

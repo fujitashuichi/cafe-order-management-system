@@ -1,35 +1,41 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ProductsContext } from './ProductsContext';
-import { ProductServices } from '../services/ProductServices';
 import { useBaseUrl } from './BaseUrlContext';
 import { usePorts } from './PortContext';
-import { type Result } from '../types/common/result.types';
-import type { Product } from '../types/types';
+import type { ProductContextType } from '../types/types.context';
+import { ProductServices } from '../services/ProductServices';
 
 
 function ProductsProvider({ children }: { children: React.ReactNode }) {
     const { backend: baseUrl } = useBaseUrl();
     const { backend: port } = usePorts();
 
-    const [result, setResult] = useState<Result<Product[], Error> | null>(null);
-    useEffect (() => {
-        const fetch = async () => {
-            const service = new ProductServices(`${baseUrl}${port}`);
-            setResult(await service.fetchProducts());
+    const [products, setProducts] = useState<ProductContextType["products"]>(null);
+    const [loading, setLoading] = useState<ProductContextType["loading"]>(true);
+    const [error, setError] = useState<ProductContextType["error"]>(null);
+
+    const reload = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+
+        const service = new ProductServices(`${baseUrl}${port}`);
+        const response = await service.fetchProducts();
+
+        if (response.ok) {
+            setProducts(response.value);
+        } else {
+            setError(response.error);
         }
-        fetch();
+
+        setLoading(false);
     }, [baseUrl, port]);
 
-    if (result === null) throw new Error("商品データをまだ取得していません")
-
-    if(!result.ok) {
-        throw result.error;
-    }
-
-    const products = result.value;
+    useEffect(() => {
+        reload();
+    }, [baseUrl, port, reload])
 
     return (
-        <ProductsContext.Provider value={products}>{children}</ProductsContext.Provider>
+        <ProductsContext.Provider value={{ products, loading, error, reload }}>{children}</ProductsContext.Provider>
     )
 }
 

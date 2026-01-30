@@ -1,3 +1,3 @@
-export type Result<T, E> =
+export type FetchResult<T, E> =
     | { ok: true; value: T; }
     | { ok: false; error: E; }

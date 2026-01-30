@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import type { Category, Product } from '../types/types';
-import { useBaseUrl } from '../contexts/BaseUrlConfig';
+import { useBaseUrl } from '../contexts/BaseUrlContext';
 import { usePorts } from '../contexts/PortContext';
 
 function AddProduct() {

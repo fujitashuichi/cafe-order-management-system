@@ -1,22 +1,23 @@
 import type { FetchResult } from "../types/common/result.types";
-import type { Product } from "../types/types";
+import type { Category } from "../types/types";
 
-export class ProductServices {
-    private readonly url: string
+export class CategoryServices{
+    private readonly url: string;
 
-    constructor(url: string) {
+    constructor (url: string) {
         this.url = url;
     }
 
-    // 情報が欠落していても、ユーザー相手の処理は止めない → try catch を使います.
-    fetchProducts = async (): Promise<FetchResult<Product[], Error>> => {
+    fetchCategories = async (): Promise<FetchResult<Category[], Error>> => {
+        // ユーザー相手の処理は止めない
         try {
-            const response = await fetch(`${this.url}/api/products`);
+            const response = await fetch(`${this.url}`);
+
             if (!response.ok) {
                 return {
                     ok: false,
-                    error: new Error("商品情報の取得に失敗しました")
-                };
+                    error: new Error("カテゴリー情報を取得できません")
+                }
             }
 
             return {
@@ -24,7 +25,7 @@ export class ProductServices {
                 value: await response.json()
             }
 
-        } catch (e) {
+        } catch (e: unknown) {
             if (e instanceof Error) {
                 return {
                     ok: false,
@@ -34,8 +35,9 @@ export class ProductServices {
 
             return {
                 ok: false,
-                error: new Error("Unknown error")
+                error: new Error("unknown error")
             };
+
         }
     }
 }

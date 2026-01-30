@@ -1,17 +1,34 @@
 import React, { useState } from 'react'
-import type { Category, Product } from '../types/types';
+import type { Product } from '../types/types';
 import { useBaseUrl } from '../contexts/BaseUrlContext';
 import { usePorts } from '../contexts/PortContext';
+import { useCategories } from '../contexts/CategoriesContext';
+import { useProducts } from '../contexts/ProductsContext';
 
 function AddProduct() {
-    const { backend: backendBaseUrl } = useBaseUrl();
-    const { backend: backendPort } = usePorts();
+    const { backend: baseUrl } = useBaseUrl();
+    const { backend: port } = usePorts();
+
+    const { error: productsError, reload: reloadProducts } = useProducts();
+    const { categories: categories, loading: loadingCategories, error: categoriesError } = useCategories();
 
     const [name, setName] = useState<Product["name"]>("");
-    const [price, setPrice] = useState<string>("-1");
+    const [price, setPrice] = useState<string | null>(null);
     const [categoryId, setCategoryId] = useState<Product["categoryId"]>(1);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
+
+
+    //  loading  //
+
+    if (loadingCategories) {
+        return <h1>商品カテゴリーを取得中...</h1>
+    }
+
+    //  end loading  //
+
+
+    if (categoriesError) throw categoriesError;
+
+    if (categories === null) throw new Error("商品カテゴリーが取得できません");
 
 
     const addProduct = async (e: React.FormEvent) => {
@@ -35,7 +52,7 @@ function AddProduct() {
             categoryId: categoryId
         }
 
-        const response = await fetch(`${backendBaseUrl}${backendPort}/api/products`, {
+        const response = await fetch(`${baseUrl}${port}/api/products`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -45,9 +62,11 @@ function AddProduct() {
 
         if (response.ok) {
             alert("商品を登録しました");
-            setProducts([...products, await response.json()]);
+            reloadProducts();
+            if (productsError) throw productsError;
+
             setName("");
-            setPrice("-1");
+            setPrice(null);
         }
     };
 
@@ -61,7 +80,7 @@ function AddProduct() {
                 </div>
                 <div className="text-left">
                     <label htmlFor="price">価格: </label>
-                    <input className="w-20 border border-gray-300 rounded" key="price" type="number" min={0} max={10000000} value={price == "-1" ? "" : price} onChange={e => setPrice(e.target.value)} />
+                    <input className="w-20 border border-gray-300 rounded" key="price" type="number" min={0} max={10000000} value={price == null ? "" : price} onChange={e => setPrice(e.target.value)} />
                 </div>
                 <div className="text-left">
                     <label htmlFor="category">カテゴリー: </label>

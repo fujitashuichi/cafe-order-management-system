@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { ProductsContext } from './ProductsContext';
-import { useBaseUrl } from './BaseUrlContext';
-import { usePorts } from './PortContext';
 import type { ProductContextType } from '../types/types.context';
 import { ProductServices } from '../services/ProductServices';
+import { useUrls } from './urlContext';
 
 
 function ProductsProvider({ children }: { children: React.ReactNode }) {
-    const { backend: baseUrl } = useBaseUrl();
-    const { backend: port } = usePorts();
+    const { backend: backendUrlCtx } = useUrls();
+    const backendUrl = backendUrlCtx.dev;
 
-    const [products, setProducts] = useState<ProductContextType["products"]>(null);
+    const [products, setProducts] = useState<ProductContextType["products"]>([]);
     const [loading, setLoading] = useState<ProductContextType["loading"]>(true);
     const [error, setError] = useState<ProductContextType["error"]>(null);
 
@@ -18,7 +17,7 @@ function ProductsProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         setError(null);
 
-        const service = new ProductServices(`${baseUrl}${port}`);
+        const service = new ProductServices(`${backendUrl}`);
         const response = await service.fetchProducts();
 
         if (response.ok) {
@@ -28,11 +27,11 @@ function ProductsProvider({ children }: { children: React.ReactNode }) {
         }
 
         setLoading(false);
-    }, [baseUrl, port]);
+    }, [backendUrl]);
 
     useEffect(() => {
         reload();
-    }, [baseUrl, port, reload])
+    }, [backendUrl, reload])
 
     return (
         <ProductsContext.Provider value={{ products, loading, error, reload }}>{children}</ProductsContext.Provider>

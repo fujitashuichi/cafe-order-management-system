@@ -2,14 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { CategoriesContext } from './CategoriesContext'
 import type { CategoriesContextType } from '../types/types.context'
 import { CategoryServices } from '../services/CategoryServices';
-import { useBaseUrl } from './BaseUrlContext';
-import { usePorts } from './PortContext';
+import { useUrls } from './urlContext';
 
 function CategoriesProvider({ children }: { children: React.ReactNode }) {
-    const { backend: baseUrl } = useBaseUrl();
-    const { backend: port } = usePorts();
+    const { backend: backendUrlCtx } = useUrls();
+    const backendUrl = backendUrlCtx.dev;
 
-    const [categories, setCategories] = useState<CategoriesContextType["categories"]>(null);
+    const [categories, setCategories] = useState<CategoriesContextType["categories"]>([]);
     const [loading, setLoading] = useState<CategoriesContextType["loading"]>(true);
     const [error, setError] = useState<CategoriesContextType["error"]>(null);
 
@@ -17,7 +16,7 @@ function CategoriesProvider({ children }: { children: React.ReactNode }) {
         setLoading(true);
         setError(null);
 
-        const service = new CategoryServices(`${baseUrl}${port}`);
+        const service = new CategoryServices(`${backendUrl}`);
         const response = await service.fetchCategories();
 
         if (response.ok) {
@@ -27,11 +26,11 @@ function CategoriesProvider({ children }: { children: React.ReactNode }) {
         }
 
         setLoading(false);
-    }, [baseUrl, port]);
+    }, [backendUrl]);
 
     useEffect(() => {
         reload();
-    }, [baseUrl, port, reload]);
+    }, [backendUrl, reload]);
 
     return (
         <CategoriesContext.Provider value={{ categories, loading, error, reload }}>{children}</CategoriesContext.Provider>

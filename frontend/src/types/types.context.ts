@@ -1,18 +1,23 @@
 import type { Category, Product } from "./types";
 
-export type PortContextType = { frontend: string, backend: string };
-
-export type BaseUrlType = { frontend: string, backend: string };
+export type UrlContextType = {
+    frontend: {
+        "dev": string
+    },
+    backend: {
+        "dev": string
+    }
+};
 
 export type ProductContextType = {
-    products: Product[] | null;
+    products: Product[];
     loading: boolean;
     error: Error | null;
     reload: () => Promise<void>;
 }
 
 export type CategoriesContextType = {
-    categories: Category[] | null;
+    categories: Category[];
     loading: boolean;
     error: Error | null;
     reload: () => Promise<void>;

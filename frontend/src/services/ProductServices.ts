@@ -26,12 +26,14 @@ export class ProductServices {
 
         } catch (e) {
             if (e instanceof Error) {
+                console.log(e);
                 return {
                     ok: false,
                     error: new Error("商品情報が存在しません")
                 };
             }
 
+            console.log(e);
             return {
                 ok: false,
                 error: new Error("Unknown error")

@@ -6,11 +6,11 @@ function AppLogo() {
             font-dancing
             text-3xl
             w-fit
-            h-[50px]
+            h-12.5
             bg-black
             text-white
-            px-[15px]
-            py-[5px]
+            px-3.75
+            py-1.25
             leading-[1.4]
             shrink-0
             flex items-center justify-center

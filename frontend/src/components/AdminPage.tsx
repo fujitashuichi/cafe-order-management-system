@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react"
 import type { Category, Product } from "../types/types";
-import { usePorts } from "../contexts/PortContext";
-import { useBaseUrl } from "../contexts/BaseUrlContext";
 import { useProducts } from "../contexts/ProductsContext";
 import { useCategories } from "../contexts/CategoriesContext";
 import AppButton from "../components/common/AppButton"
 import EditProductModal from "./EditProductModal";
+import { useUrls } from "../contexts/urlContext";
+import AddProductForm from "./AddProductForm";
 
 
 function AdminPage() {
-    const { backend: baseUrl } = useBaseUrl();
-    const { backend: port } = usePorts();
+    const { backend: backendUrlCtx } = useUrls();
+    const backendUrl = backendUrlCtx.dev;
 
-    const { products: products, loading: loadingProducts, reload: reloadProducts } = useProducts();
-    const { categories: categories, loading: loadingCategories, reload: reloadCategories } = useCategories();
+    const { products: products, loading: loadingProducts, error: productsError, reload: reloadProducts } = useProducts();
+    const { categories: categories, loading: loadingCategories, error: categoriesError, reload: reloadCategories } = useCategories();
+
+    const error = productsError || categoriesError;
 
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -22,28 +24,19 @@ function AdminPage() {
     useEffect(() => {
         reloadProducts();
         reloadCategories();
-    }, []);
+    }, [reloadProducts, reloadCategories]);
+
 
     //  loading  //
 
     if (loadingProducts) {
-        return(<h1>商品読み込み中...</h1>)
+        return <h1>商品読み込み中...</h1>;
     }
     if (loadingCategories) {
-        return(<h1>商品カテゴリー読み込み中...</h1>)
+        return <h1>商品カテゴリー読み込み中...</h1>;
     }
 
     //  end Loading  //
-
-    if (products === null) {
-        <h1>Something went wrong</h1>
-        throw new Error("商品情報を取得していません");
-    }
-    if (categories === null) {
-        <h1>Something went wrong</h1>
-        throw new Error("カテゴリー情報を取得していません");
-    }
-
 
     const handleUpdateCompleted = () => {
         reloadProducts();
@@ -63,7 +56,7 @@ function AdminPage() {
         if (!result) return;
 
         try {
-            const response = await fetch(`${baseUrl}${port}/api/products/${id}`, {
+            const response = await fetch(`${backendUrl}/api/products/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
@@ -95,7 +88,7 @@ function AdminPage() {
         };
 
         try {
-            const response = await fetch(`${baseUrl}${port}/api/categories`, {
+            const response = await fetch(`${backendUrl}/api/categories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -125,7 +118,7 @@ function AdminPage() {
         if (!result) return;
 
         try {
-            const response = await fetch(`${baseUrl}${port}/api/categories/${id}`, {
+            const response = await fetch(`${backendUrl}/api/categories/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
@@ -149,6 +142,15 @@ function AdminPage() {
 
     return (
         <div className="p-5 border border-gray-300">
+
+            {error&&
+                <>
+                    <h1>エラー発生</h1>
+                    <p>{error.message}</p>
+                </>
+            }
+
+            <AddProductForm />
 
             <form className="mt-5" onSubmit={(e) => addCategory(e)}>
                 <label className="text-orange-500 text-2xs" htmlFor="newCategory">新しいカテゴリを追加する: </label>
@@ -213,7 +215,6 @@ function AdminPage() {
                     categories={categories}
                     onClose={() => {setEditingProduct(null)}}
                     onUpdate={() => handleUpdateCompleted()}
-                    backendPort={port}
                 />
             )}
         </div>

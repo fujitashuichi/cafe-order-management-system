@@ -1,17 +1,20 @@
 import { useState } from "react";
 import type { Category, Product } from "../types/types"
 import AppButton from "./common/AppButton";
+import { useUrls } from "../contexts/urlContext";
 
 type EditModalProps = {
     product: Product;
     categories: Category[];
     onClose: () => void;
     onUpdate: (UpdateProduct: Product) => void;
-    backendPort: string;
 }
 
 
-function EditProductModal({ product, categories, onClose, onUpdate, backendPort }: EditModalProps) {
+function EditProductModal({ product, categories, onClose, onUpdate }: EditModalProps) {
+    const { backend: backendUrlCtx } = useUrls();
+    const backendUrl = backendUrlCtx.dev;
+
     const [name, setName] = useState<Product["name"]>(product.name);
     const [price, setPrice] = useState<Product["price"]>(product.price);
     const [categoryId, setCategoryId] = useState<Product["categoryId"]>(product.categoryId);
@@ -19,7 +22,7 @@ function EditProductModal({ product, categories, onClose, onUpdate, backendPort 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch(`http://localhost:${backendPort}/api/products/${product.id}`, {
+        const response = await fetch(`${backendUrl}/api/products/${product.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name, price: Number(price), categoryId })

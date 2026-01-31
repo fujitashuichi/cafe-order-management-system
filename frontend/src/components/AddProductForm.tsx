@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import type { Product } from '../types/types';
-import { useBaseUrl } from '../contexts/BaseUrlContext';
-import { usePorts } from '../contexts/PortContext';
 import { useCategories } from '../contexts/CategoriesContext';
 import { useProducts } from '../contexts/ProductsContext';
+import { useUrls } from '../contexts/urlContext';
 
-function AddProduct() {
-    const { backend: baseUrl } = useBaseUrl();
-    const { backend: port } = usePorts();
+function AddProductForm() {
+    const { backend: backendUrlCtx } = useUrls();
+    const backendUrl = backendUrlCtx.dev;
+
 
     const { error: productsError, reload: reloadProducts } = useProducts();
     const { categories: categories, loading: loadingCategories, error: categoriesError } = useCategories();
@@ -52,7 +52,7 @@ function AddProduct() {
             categoryId: categoryId
         }
 
-        const response = await fetch(`${baseUrl}${port}/api/products`, {
+        const response = await fetch(`${backendUrl}/api/products`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -94,4 +94,4 @@ function AddProduct() {
     )
 }
 
-export default AddProduct
+export default AddProductForm

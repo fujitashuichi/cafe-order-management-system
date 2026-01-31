@@ -11,7 +11,7 @@ export class CategoryServices{
     fetchCategories = async (): Promise<FetchResult<Category[], Error>> => {
         // ユーザー相手の処理は止めない
         try {
-            const response = await fetch(`${this.url}`);
+            const response = await fetch(`${this.url}/api/categories`);
 
             if (!response.ok) {
                 return {

@@ -47,3 +47,12 @@
   * ただし、技術力と移行コストを考え、**nullを複数返す可能性を許容**している
 * AdminPageを編集（これからブラッシュアップ）
 * AddProductsも編集
+
+# 2026-01-30
+* AdminPageの例外処理を整理
+* 修正: ProviderがUIにnullを伝えていたのを修正。（error, loading を返すため、nullは不要）
+* StrictModeを解除（設計固めを優先）
+* UrlProviderを作成し、URL管理方法を若干修正
+* AddProductFormを挿し込み、AdminPageの再構築を完了
+* 予定: 次の改修に移る前に、一度テストを導入
+  テスト導入の前に、State遷移図を書いて流れを確認する。

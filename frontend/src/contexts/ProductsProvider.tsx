@@ -7,6 +7,8 @@ import type { ProductContextType } from '../types/types.context';
 
 ////////// エラーは上層で整理済み //////////
 
+////////// 将来的にデータ型検証を切り出す余地あり
+
 function ProductsProvider({ children }: { children: React.ReactNode }) {
 
     function isProduct(value: unknown): value is Product {

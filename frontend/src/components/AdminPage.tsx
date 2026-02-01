@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { Category, Product } from "../types/types";
 import { useProducts } from "../contexts/ProductsContext";
 import { useCategories } from "../contexts/CategoriesContext";
@@ -8,38 +8,56 @@ import { useUrls } from "../contexts/urlContext";
 import AddProductForm from "./AddProductForm";
 
 
+
+////////// TODO(遙か先に見据える理想): Provider統合後、statusをUIから隠蔽する
+////////// まずは、Errorをbodyに含めない設計を目指す
+
+
+
 function AdminPage() {
     const { backend: backendUrlCtx } = useUrls();
     const backendUrl = backendUrlCtx.dev;
 
-    const { products: products, loading: loadingProducts, error: productsError, reload: reloadProducts } = useProducts();
-    const { categories: categories, loading: loadingCategories, error: categoriesError, reload: reloadCategories } = useCategories();
-
-    const error = productsError || categoriesError;
+    const { status: productStatus, body: productData } = useProducts();
+    const { status: categoryStatus, body: categoryData } = useCategories();
 
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-
-    useEffect(() => {
-        reloadProducts();
-        reloadCategories();
-    }, [reloadProducts, reloadCategories]);
-
-
     //  loading  //
 
-    if (loadingProducts) {
+    if (productStatus === "loading") {
         return <h1>商品読み込み中...</h1>;
     }
-    if (loadingCategories) {
+    if (categoryStatus === "loading") {
         return <h1>商品カテゴリー読み込み中...</h1>;
     }
 
     //  end Loading  //
 
+    if (productStatus === "error") {
+        console.log(productStatus);
+        return <h1>商品情報取得エラー</h1>
+    }
+    if (categoryStatus === "error") {
+        console.log(categoryStatus);
+        return <h1>商品カテゴリー取得エラー</h1>
+    }
+
+    if (productData instanceof Error) {
+        console.log(productData);
+        return <h1>商品情報取得エラー</h1>
+    }
+    if (categoryData instanceof Error) {
+        console.log(categoryData);
+        return <h1>商品カテゴリー取得エラー</h1>
+    }
+
+    const products = productData;
+    const categories = categoryData;
+
     const handleUpdateCompleted = () => {
-        reloadProducts();
+        // reloadProducts();
         setEditingProduct(null);
         alert("更新が完了しました");
     };
@@ -66,7 +84,7 @@ function AdminPage() {
 
             if (response.ok) {
                 alert("正常に削除されました");
-                reloadProducts();
+                // reloadProducts();
             }
         } catch (err) {
             alert("商品の削除に失敗しました");
@@ -97,7 +115,7 @@ function AdminPage() {
             });
 
             if (response.ok) {
-                reloadCategories();
+                // reloadCategories();
                 alert("新しいカテゴリーを追加しました");
                 setInputCategoryName("");
             }
@@ -132,7 +150,7 @@ function AdminPage() {
 
             if (response.ok) {
                 alert("正常に削除されました");
-                reloadCategories();
+                // reloadCategories();
             }
         } catch (err) {
             alert("商品の削除に失敗しました");
@@ -142,13 +160,6 @@ function AdminPage() {
 
     return (
         <div className="p-5 border border-gray-300">
-
-            {error&&
-                <>
-                    <h1>エラー発生</h1>
-                    <p>{error.message}</p>
-                </>
-            }
 
             <AddProductForm />
 

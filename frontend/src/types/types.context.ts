@@ -2,23 +2,19 @@ import type { Category, Product } from "./types";
 
 export type UrlContextType = {
     frontend: {
-        "dev": string
-    },
+        "dev": string;
+    };
     backend: {
-        "dev": string
-    }
+        "dev": string;
+    };
 };
 
 export type ProductContextType = {
-    products: Product[];
-    loading: boolean;
-    error: Error | null;
-    reload: () => Promise<void>;
+    status: "loading" | "success" | "error";
+    body: Product[] | Error;
 }
 
 export type CategoriesContextType = {
-    categories: Category[];
-    loading: boolean;
-    error: Error | null;
-    reload: () => Promise<void>;
+    status: "loading" | "success" | "error";
+    body: Category[] | Error;
 }

@@ -1,40 +1,63 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ProductsContext } from './ProductsContext';
+import ProductLoader from '../services/ProductLoader';
+import type { Product } from '../types/types';
 import type { ProductContextType } from '../types/types.context';
-import { ProductServices } from '../services/ProductServices';
-import { useUrls } from './urlContext';
 
+
+////////// エラーは上層で整理済み //////////
 
 function ProductsProvider({ children }: { children: React.ReactNode }) {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
 
-    const [products, setProducts] = useState<ProductContextType["products"]>([]);
-    const [loading, setLoading] = useState<ProductContextType["loading"]>(true);
-    const [error, setError] = useState<ProductContextType["error"]>(null);
-
-    const reload = useCallback(async () => {
-        setLoading(true);
-        setError(null);
-
-        const service = new ProductServices(`${backendUrl}`);
-        const response = await service.fetchProducts();
-
-        if (response.ok) {
-            setProducts(response.value);
-        } else {
-            setError(response.error);
+    function isProduct(value: unknown): value is Product {
+        return (
+            typeof value === "object" &&
+            value !== null &&
+            "id" in value &&
+            "name" in value &&
+            "price" in value
+        )
+    }
+    function isProductArray(value: unknown): value is Product[] {
+        if (!Array.isArray(value)) {
+            return false;
         }
 
-        setLoading(false);
-    }, [backendUrl]);
+        return value.every(isProduct);
+    }
+
+
+    const [status, setStatus] = useState<ProductContextType["status"]>("loading");
+    const [body, setBody] = useState<ProductContextType["body"]>([]);
+
+    const { load: loadProducts } = ProductLoader();
 
     useEffect(() => {
-        reload();
-    }, [backendUrl, reload])
+        const load = async () => {
+            setStatus("loading");
+
+            const data = await loadProducts();
+
+            if (data instanceof Error) {
+                setStatus("error");
+                setBody(data);
+                return;
+            }
+
+            if (!isProductArray(data)) {
+                setStatus("error");
+                setBody(new Error("取得した商品データが壊れています"));
+                return;
+            }
+
+            setStatus("success");
+            setBody(data);
+        }
+        load();
+    }, [loadProducts]);
 
     return (
-        <ProductsContext.Provider value={{ products, loading, error, reload }}>{children}</ProductsContext.Provider>
+        <ProductsContext.Provider value={{ status, body }}>{children}</ProductsContext.Provider>
     )
 }
 

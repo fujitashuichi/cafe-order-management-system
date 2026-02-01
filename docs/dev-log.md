@@ -48,11 +48,16 @@
 * AdminPageを編集（これからブラッシュアップ）
 * AddProductsも編集
 
-# 2026-01-30
+# 2026-01-31
 * AdminPageの例外処理を整理
 * 修正: ProviderがUIにnullを伝えていたのを修正。（error, loading を返すため、nullは不要）
 * StrictModeを解除（設計固めを優先）
 * UrlProviderを作成し、URL管理方法を若干修正
 * AddProductFormを挿し込み、AdminPageの再構築を完了
-* 予定: 次の改修に移る前に、一度テストを導入
+* <s>予定: 次の改修に移る前に、一度テストを導入</s>
   テスト導入の前に、State遷移図を書いて流れを確認する。
+* 予定変更: (Providerの改修を優先。テストはバグ探しではなくバグ対策後の確認作業として扱う方針)
+* 例外を考えるとProviderの責務が増えるため、中間層を設計する方針に
+
+# 2026-02-01
+* AdminPageを編集 → UIに「SuccessかつError」が届く可能性を発見（**修正最優先**）

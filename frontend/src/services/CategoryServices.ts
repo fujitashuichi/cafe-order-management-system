@@ -1,5 +1,9 @@
 import type { FetchResult } from "../types/common/result.types";
-import type { Category } from "../types/types";
+
+
+/////////////// Service は Error を値として返します
+
+
 
 export class CategoryServices{
     private readonly url: string;
@@ -8,7 +12,7 @@ export class CategoryServices{
         this.url = url;
     }
 
-    fetchCategories = async (): Promise<FetchResult<Category[], Error>> => {
+    fetchCategories = async (): Promise<FetchResult<unknown, Error>> => {
         // ユーザー相手の処理は止めない
         try {
             const response = await fetch(`${this.url}/api/categories`);

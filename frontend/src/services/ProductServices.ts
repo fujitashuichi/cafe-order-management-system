@@ -1,5 +1,8 @@
 import type { FetchResult } from "../types/common/result.types";
-import type { Product } from "../types/types";
+
+
+/////////////// Service は Error を値として返します
+
 
 export class ProductServices {
     private readonly url: string
@@ -9,7 +12,7 @@ export class ProductServices {
     }
 
     // 情報が欠落していても、ユーザー相手の処理は止めない → try catch を使います.
-    fetchProducts = async (): Promise<FetchResult<Product[], Error>> => {
+    fetchProducts = async (): Promise<FetchResult<unknown, Error>> => {
         try {
             const response = await fetch(`${this.url}/api/products`);
             if (!response.ok) {
@@ -24,7 +27,7 @@ export class ProductServices {
                 value: await response.json()
             }
 
-        } catch (e) {
+        } catch (e: unknown) {
             if (e instanceof Error) {
                 console.log(e);
                 return {

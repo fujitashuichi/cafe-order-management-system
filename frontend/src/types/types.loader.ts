@@ -1,7 +1,7 @@
-export type ProductLoaderType = {
-    load: () => Promise<unknown | Error>
-}
+export type LoaderResult<T> =
+        | { status: "idle" }
+        | { status: "loading" }
+        | { status: "error", error: Error }
+        | { status: "success", value: T };
 
-export type CategoryLoaderType = {
-    load: () => Promise<unknown | Error>
-}
+export type Status = "idle" | "loading" | "error" | "success"

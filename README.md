@@ -1,8 +1,6 @@
 # cafe-order-management-system
 プログラミング初級者の学びの集大成
 
-### ↓状態変遷図
-[diagram.md](./docs/diagram.md)
 ### ↓開発ログ
 [dev-log.md](./docs/dev-log.md)
 ### ↓要件定義

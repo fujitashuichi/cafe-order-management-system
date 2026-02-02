@@ -1,25 +1,31 @@
 import { useState } from "react"
 import type { Category, Product } from "../types/types";
-import { useProducts } from "../contexts/ProductsContext";
-import { useCategories } from "../contexts/CategoriesContext";
-import AppButton from "../components/common/AppButton"
-import EditProductModal from "./EditProductModal";
 import { useUrls } from "../contexts/urlContext";
 import AddProductForm from "./AddProductForm";
+import AppButton from "./common/AppButton";
+import EditProductModal from "./EditProductModal";
+import { useProducts } from "../contexts/ProductsContext";
+import { useCategories } from "../contexts/CategoriesContext";
 
 
+////////// 先に見据える理想: Provider統合後、statusをUIから隠蔽する
 
-////////// TODO(遙か先に見据える理想): Provider統合後、statusをUIから隠蔽する
-////////// まずは、Errorをbodyに含めない設計を目指す
+////////// Union型の導入はできた。次はUnionをHookで完結させる設計を目指す
 
 
 
 function AdminPage() {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
+    const ProductData = useProducts();
+    const productStatus = ProductData.status;
+    let productError;
+    let products: Product[] = [];
 
-    const { status: productStatus, body: productData } = useProducts();
-    const { status: categoryStatus, body: categoryData } = useCategories();
+    const CategoryData = useCategories();
+    const categoryStatus = CategoryData.status;
+    let categoryError;
+    let categories: Category[] = [];
+
+    const { backend: backendUrl } = useUrls();
 
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -27,34 +33,31 @@ function AdminPage() {
     //  loading  //
 
     if (productStatus === "loading") {
-        return <h1>商品読み込み中...</h1>;
+        return <h1>商品読み込み中...</h1>
     }
     if (categoryStatus === "loading") {
-        return <h1>商品カテゴリー読み込み中...</h1>;
+        return <h1>商品カテゴリー読み込み中...</h1>
     }
 
     //  end Loading  //
 
     if (productStatus === "error") {
-        console.log(productStatus);
+        console.log(productError);
+        productError = ProductData.error;
         return <h1>商品情報取得エラー</h1>
     }
     if (categoryStatus === "error") {
-        console.log(categoryStatus);
+        console.log(categoryError);
         return <h1>商品カテゴリー取得エラー</h1>
     }
 
-    if (productData instanceof Error) {
-        console.log(productData);
-        return <h1>商品情報取得エラー</h1>
+    if (productStatus === "success") {
+        products = ProductData.value;
     }
-    if (categoryData instanceof Error) {
-        console.log(categoryData);
-        return <h1>商品カテゴリー取得エラー</h1>
+    if (categoryStatus === "success") {
+        categories = CategoryData.value;
     }
 
-    const products = productData;
-    const categories = categoryData;
 
     const handleUpdateCompleted = () => {
         // reloadProducts();

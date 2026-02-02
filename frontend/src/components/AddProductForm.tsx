@@ -1,34 +1,21 @@
 import React, { useState } from 'react'
-import type { Product } from '../types/types';
-import { useCategories } from '../contexts/CategoriesContext';
-import { useProducts } from '../contexts/ProductsContext';
+import type { Category, Product } from '../types/types';
 import { useUrls } from '../contexts/urlContext';
+import { useCategories } from '../contexts/CategoriesContext';
 
 function AddProductForm() {
     const { backend: backendUrlCtx } = useUrls();
     const backendUrl = backendUrlCtx.dev;
 
-
-    const { error: productsError, reload: reloadProducts } = useProducts();
-    const { categories: categories, loading: loadingCategories, error: categoriesError } = useCategories();
+    const CategoryData = useCategories();
+    let categories: Category[] = [];
+    if (CategoryData.status === "success") {
+        categories = CategoryData.value;
+    }
 
     const [name, setName] = useState<Product["name"]>("");
     const [price, setPrice] = useState<string | null>(null);
     const [categoryId, setCategoryId] = useState<Product["categoryId"]>(1);
-
-
-    //  loading  //
-
-    if (loadingCategories) {
-        return <h1>商品カテゴリーを取得中...</h1>
-    }
-
-    //  end loading  //
-
-
-    if (categoriesError) throw categoriesError;
-
-    if (categories === null) throw new Error("商品カテゴリーが取得できません");
 
 
     const addProduct = async (e: React.FormEvent) => {
@@ -62,9 +49,6 @@ function AddProductForm() {
 
         if (response.ok) {
             alert("商品を登録しました");
-            reloadProducts();
-            if (productsError) throw productsError;
-
             setName("");
             setPrice(null);
         }

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { CategoriesContext } from './CategoriesContext'
-import CategoryLoader from '../services/CategoryLoader';
-import type { Category } from '../types/types';
 import type { CategoriesContextType } from '../types/types.context';
+import type { Category } from '../types/types';
+import useCategoryLoader from '../services/useCategoryLoader';
 
 function CategoriesProvider({ children }: { children: React.ReactNode }) {
     const isCategory = (value: unknown): value is Category => {
@@ -11,7 +11,7 @@ function CategoriesProvider({ children }: { children: React.ReactNode }) {
             value !== null &&
             "id" in value &&
             "name" in value &&
-            "hasProduct" in value &&
+            "hasProducts" in value &&
             "products" in value
         )
     }
@@ -24,37 +24,37 @@ function CategoriesProvider({ children }: { children: React.ReactNode }) {
     }
 
 
-    const [status, setStatus] = useState<CategoriesContextType["status"]>("loading");
-    const [body, setBody] = useState<CategoriesContextType["body"]>([]);
+    let result: CategoriesContextType;
 
-    const { load: loadCategories } = CategoryLoader();
+    const data = useCategoryLoader();
 
-    useEffect(() => {
-        const load = async () => {
-            setStatus("loading");
+    switch (data.status) {
+        case "idle":
+            result = { status: "idle" };
+            break;
 
-            const data = await loadCategories();
+        case "loading":
+            result = { status: "loading" };
+            break;
 
-            if (data instanceof Error) {
-                setStatus("error");
-                setBody(data);
-                return;
+        case "error":
+            result = { status: "error", error: data.error };
+            break;
+
+        case "success":
+            if (!isCategoryArray(data.value)) {
+                result = { status: "error", error: new Error("商品データが壊れています") }
+            } else {
+                result = { status: "success", value: data.value }
             }
+            break;
 
-            if (!isCategoryArray(data)) {
-                setStatus("error");
-                setBody(new Error("カテゴリー情報が壊れています"));
-                return;
-            }
-
-            setStatus("success");
-            setBody(data);
-        }
-        load();
-    }, [loadCategories]);
+        default:
+            result = { status: "idle" }
+    }
 
     return (
-        <CategoriesContext.Provider value={{ status, body }}>{children}</CategoriesContext.Provider>
+        <CategoriesContext.Provider value={result}>{children}</CategoriesContext.Provider>
     )
 }
 

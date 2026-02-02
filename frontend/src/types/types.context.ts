@@ -9,12 +9,14 @@ export type UrlContextType = {
     };
 };
 
-export type ProductContextType = {
-    status: "loading" | "success" | "error";
-    body: Product[] | Error;
-}
+export type ProductContextType =
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "error", error: Error }
+    | { status: "success", value: Product[] };
 
-export type CategoriesContextType = {
-    status: "loading" | "success" | "error";
-    body: Category[] | Error;
-}
+export type CategoriesContextType =
+    | { status: "idle" }
+    | { status: "loading" }
+    | { status: "error", error: Error }
+    | { status: "success", value: Category[] };

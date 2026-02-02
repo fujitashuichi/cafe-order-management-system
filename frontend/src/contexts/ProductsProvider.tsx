@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ProductsContext } from './ProductsContext';
-import ProductLoader from '../services/ProductLoader';
 import type { Product } from '../types/types';
 import type { ProductContextType } from '../types/types.context';
+import useProductLoader from '../services/useProductLoader';
 
 
 ////////// エラーは上層で整理済み //////////
@@ -10,8 +10,7 @@ import type { ProductContextType } from '../types/types.context';
 ////////// 将来的にデータ型検証を切り出す余地あり
 
 function ProductsProvider({ children }: { children: React.ReactNode }) {
-
-    function isProduct(value: unknown): value is Product {
+    const isProduct = (value: unknown): value is Product => {
         return (
             typeof value === "object" &&
             value !== null &&
@@ -20,7 +19,7 @@ function ProductsProvider({ children }: { children: React.ReactNode }) {
             "price" in value
         )
     }
-    function isProductArray(value: unknown): value is Product[] {
+    const isProductArray = (value: unknown): value is Product[] => {
         if (!Array.isArray(value)) {
             return false;
         }
@@ -29,37 +28,37 @@ function ProductsProvider({ children }: { children: React.ReactNode }) {
     }
 
 
-    const [status, setStatus] = useState<ProductContextType["status"]>("loading");
-    const [body, setBody] = useState<ProductContextType["body"]>([]);
+    let result: ProductContextType;
 
-    const { load: loadProducts } = ProductLoader();
+    const data = useProductLoader();
 
-    useEffect(() => {
-        const load = async () => {
-            setStatus("loading");
+    switch (data.status) {
+        case "idle":
+            result = { status: "idle" };
+            break;
 
-            const data = await loadProducts();
+        case "loading":
+            result = { status: "loading" };
+            break;
 
-            if (data instanceof Error) {
-                setStatus("error");
-                setBody(data);
-                return;
+        case "error":
+            result = { status: "error", error: data.error };
+            break;
+
+        case "success":
+            if (!isProductArray(data.value)) {
+                result = { status: "error", error: new Error("商品データが壊れています") }
+            } else {
+                result = { status: "success", value: data.value }
             }
+            break;
 
-            if (!isProductArray(data)) {
-                setStatus("error");
-                setBody(new Error("取得した商品データが壊れています"));
-                return;
-            }
-
-            setStatus("success");
-            setBody(data);
-        }
-        load();
-    }, [loadProducts]);
+        default:
+            result = { status: "idle" }
+    }
 
     return (
-        <ProductsContext.Provider value={{ status, body }}>{children}</ProductsContext.Provider>
+        <ProductsContext.Provider value={result}>{children}</ProductsContext.Provider>
     )
 }
 

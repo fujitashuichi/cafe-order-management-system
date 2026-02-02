@@ -60,6 +60,65 @@
 * 例外を考えるとProviderの責務が増えるため、中間層を設計する方針に
 
 # 2026-02-01
-* AdminPageを編集 → UIに「SuccessかつError」が届く可能性を発見（**修正最優先**）
+* AdminPageを編集 → <s>UIに「SuccessかつError」が届く可能性を発見（**修正最優先**）</s>✓済
 * Provider/Loaderを編集 → 例外データの流れを確認し、重複確認を排除
   これにより、「SuccessかつError」状態が解消されました。
+* **問題発生**: dev時に無限エラー状態（同じfetchエラーが連続）
+* 無限エラーはService層で発生 → Loading失敗後に即座に呼び直されている可能性
+* dev切断後もエラーが長時間流れる → 非同期が大量に溜まっていることを示している可能性
+* Service層でinstanseof Error に引っかかっている → 単純にfetch時のエラー。
+  ただし、エラー時に即座に再読み込みしているのが最大の問題
+* **修正最優先**: 取得エラー時に即座にリロードしないように制御する
+* 予定(すぐにではない): Service層のBE通信を行うファイルは例外処理に集中させたいため、1層下のLoader層で実行タイミングを計る方針に。
+  したがって、さらに1層下のProviderにローディング可能かどうかを伝える。
+* 構造上無限エラーの原因はService/Providerの非同期処理のトリガーにある可能性が高い → エラーメッセージにより否定された
+* UIが再レンダリングを起こしている → 状態が変わって繰り返しRenderされている可能性 → 無限エラーに話が回帰する
+* **原因を切り分け**: renderに関わる値を1つ1つ固定化するか、分岐をなくしてみる。
+  * status分岐を無効化し、レンダリング一回で止まるか確認: 変化なし
+  * statusの取りうる値すべてを試す: 変化なし
+  * 以上から、Providerのstatus管理失敗を否定
+* **外部データを切り離す**: 外部データに関わらないエラーであるため、BE自体を止めてみた。
+  * **FE単独のエラー**: FE単独で無限レンダリングが起こっている。fetchエラーの表示はない
+  * ただし、ProductProviderでエラーが起こっているという表示がここでも残った。
+    これは、fetchエラーが渡った時、データが空だった時、必ずProductProviderだけが破綻しているように見える。
+* **考察**: Providerのstatus管理は問題ないが例外には耐えられない。これは、最近追加したデータロジックに起因している可能性が高い。
+  最初に浮かぶとすれば → **Providerのローディング管理の欠陥**
+* 「ProductProvider内でロジックを無効化し、固定値を返す → レンダリング成功」
+  かつ、
+  「同様のロジックを持つCategoriesProviderは正常動作」
+  よって、
+  <s>**タイポ、またはデータ構造自体のミスの可能性が浮上**</s>
+* **解決**: Loader層の Loading=true にするタイミングを書き間違えていた → Providerは崩壊していなかったが、その上層が嘘をついていたため、Loading管理の欠陥として露呈した。
+
+# 2026-02-02
+* **エラー**: ErrorでもProduct[]でもない値が流入。上層がundefinedなどをErrorかのように扱っている可能性。
+    → console.error("dataType: " + typeof data); で精査
+    → **datatype: object** だった。Service層の責務が正しくない？
+* dataにnew Error を渡していたため、typeof data の意味がなかった。new Error 以前の値で再精査
+    → invalid products data: {ok: true, value: Array(3)}
+    → jsonは生きているが、Providerでの型検証が間違っていたためにError扱いされている
+    → 生のjsonを型検証にかけないように修正
+    → Serviceがres.json() をしておく
+    → 遡ったらすでにされていた。よって、**jsonが悪い可能性が消えた**
+* 確信: **LoaderとProviderの契約がずれていた**
+    よく見たところ、Providerは unknown | Error を期待しているのに、
+    Providerは loading: boolean を付けていた。
+    つまり、今までの検証は関係なかった。
+* Providerはステータスも扱いたいため、今回はLoader側の型に従う
+* **責務再定義**: UIから状態を切り離しすぎて、UIの描画タイミングまで上層が握っていた。
+    これは、進めば進むほど自分の首を絞める設計だと気づいた。
+    よってここで、Providerはローディング状態も公開し、Union型も導入する。
+
+  ------Service-------
+  ok: boolean
+  ------Loading-------
+  status: "loading" | "success" | "error"
+  ------Provider------
+  status: "loading" | "success" | "error"
+
+  **Loadingが通信状態の意味付けを済ませて、Providerにはデータ検査と配布を任せる**
+* LoaderをHookに変更
+* Providerを改修
+* AdminPageを改修
+* AddProductFormを改修
+* **UI側にHookの責務が混ざったが、責務の状態自体は明確にできた**

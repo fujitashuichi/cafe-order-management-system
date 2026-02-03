@@ -33,11 +33,11 @@
             一般的でないロジックが散見。
 * Contextを分割化 → Providerが依存関係を持たないように修正する予定
 
-# 2026-01-28
+## 2026-01-28
 * FEでServiceに通信処理を委託（Providerの肥大化を抑える）
 * ProductServicesを作成。
 
-# 2026-01-29
+## 2026-01-29
 * ProductServiceをクラス化 → ProductProviderのEffectフェーズとして利用。
 * 01/27の続き: AdminPageのProduct関連で、画面・ローディング状態以外の切り出しが完了。
 * 例外処理のコードを整形
@@ -48,7 +48,7 @@
 * AdminPageを編集（これからブラッシュアップ）
 * AddProductsも編集
 
-# 2026-01-31
+## 2026-01-31
 * AdminPageの例外処理を整理
 * 修正: ProviderがUIにnullを伝えていたのを修正。（error, loading を返すため、nullは不要）
 * StrictModeを解除（設計固めを優先）
@@ -59,7 +59,7 @@
 * 予定変更: Providerの改修を優先。(テストはバグ探しではなくバグ対策後の確認作業として扱う方針)
 * 例外を考えるとProviderの責務が増えるため、中間層を設計する方針に
 
-# 2026-02-01
+## 2026-02-01
 * AdminPageを編集 → <s>UIに「SuccessかつError」が届く可能性を発見（**修正最優先**）</s>✓済
 * Provider/Loaderを編集 → 例外データの流れを確認し、重複確認を排除
   これにより、「SuccessかつError」状態が解消されました。
@@ -90,7 +90,7 @@
   <s>**タイポ、またはデータ構造自体のミスの可能性が浮上**</s>
 * **解決**: Loader層の Loading=true にするタイミングを書き間違えていた → Providerは崩壊していなかったが、その上層が嘘をついていたため、Loading管理の欠陥として露呈した。
 
-# 2026-02-02
+## 2026-02-02
 * **エラー**: ErrorでもProduct[]でもない値が流入。上層がundefinedなどをErrorかのように扱っている可能性。
     → console.error("dataType: " + typeof data); で精査
     → **datatype: object** だった。Service層の責務が正しくない？
@@ -123,6 +123,21 @@
 * AddProductFormを改修
 * **UI側にHookの責務が混ざったが、責務の状態自体は明確にできた**
 
-# 2026-02-03
+## 2026-02-03
 * validatorsを切り出し、Providerを薄く
 * **タスク**: Boundaryを追加して、success以外を処理させる
+* Boundary → useSuccess → UI の構造が完成。現段階では毎回全体ロードを基本にして改修していく
+  ------Service------
+  ok: boolean
+  ------Loading------
+  status: "idle" | "loading" | "error" | "success"
+  ------Provider-----
+  // ここで、JSONを解析し型走査
+  status: "idle" | "loading" | "error" | "success"
+  ------Boundary-----
+  \<Loading /> | <></>
+  -----useSuccess----
+  "success"→data
+  !"success"→Error
+  --------UI---------
+  data

@@ -1,17 +1,13 @@
 import React, { useState } from 'react'
-import type { Category, Product } from '../types/types';
-import { useUrls } from '../contexts/urlContext';
-import { useCategories } from '../contexts/CategoriesContext';
+import type { Product } from '../types/types';
+import { useUrls } from '../contexts/UrlContext';
+import useSuccessCategories from '../contexts/useSuccessCategories';
 
 function AddProductForm() {
     const { backend: backendUrlCtx } = useUrls();
     const backendUrl = backendUrlCtx.dev;
 
-    const CategoryData = useCategories();
-    let categories: Category[] = [];
-    if (CategoryData.status === "success") {
-        categories = CategoryData.value;
-    }
+    const categories = useSuccessCategories();
 
     const [name, setName] = useState<Product["name"]>("");
     const [price, setPrice] = useState<string | null>(null);

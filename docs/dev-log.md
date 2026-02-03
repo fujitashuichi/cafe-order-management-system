@@ -122,3 +122,7 @@
 * AdminPageを改修
 * AddProductFormを改修
 * **UI側にHookの責務が混ざったが、責務の状態自体は明確にできた**
+
+# 2026-02-03
+* validatorsを切り出し、Providerを薄く
+* **タスク**: Boundaryを追加して、success以外を処理させる

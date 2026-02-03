@@ -1,8 +1,8 @@
 import React from 'react'
 import { ProductsContext } from './ProductsContext';
-import type { Product } from '../types/types';
 import type { ProductContextType } from '../types/types.context';
 import useProductLoader from '../services/useProductLoader';
+import { isProductArray } from '../validators/product';
 
 
 ////////// エラーは上層で整理済み //////////
@@ -10,24 +10,6 @@ import useProductLoader from '../services/useProductLoader';
 ////////// 将来的にデータ型検証を切り出す余地あり
 
 function ProductsProvider({ children }: { children: React.ReactNode }) {
-    const isProduct = (value: unknown): value is Product => {
-        return (
-            typeof value === "object" &&
-            value !== null &&
-            "id" in value &&
-            "name" in value &&
-            "price" in value
-        )
-    }
-    const isProductArray = (value: unknown): value is Product[] => {
-        if (!Array.isArray(value)) {
-            return false;
-        }
-
-        return value.every(isProduct);
-    }
-
-
     let result: ProductContextType;
 
     const data = useProductLoader();

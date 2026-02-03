@@ -1,62 +1,26 @@
 import { useState } from "react"
 import type { Category, Product } from "../types/types";
-import { useUrls } from "../contexts/urlContext";
+import { useUrls } from "../contexts/UrlContext";
 import AddProductForm from "./AddProductForm";
 import AppButton from "./common/AppButton";
 import EditProductModal from "./EditProductModal";
-import { useProducts } from "../contexts/ProductsContext";
-import { useCategories } from "../contexts/CategoriesContext";
+import useSuccessProducts from "../contexts/useSuccessProducts";
+import useSuccessCategories from "../contexts/useSuccessCategories";
 
 
-////////// 先に見据える理想: Provider統合後、statusをUIから隠蔽する
 
-////////// Union型の導入はできた。次はUnionをHookで完結させる設計を目指す
+////////// Boundaryによって、Successケースだけを扱えるようにしています
 
 
 
 function AdminPage() {
-    const ProductData = useProducts();
-    const productStatus = ProductData.status;
-    let productError;
-    let products: Product[] = [];
-
-    const CategoryData = useCategories();
-    const categoryStatus = CategoryData.status;
-    let categoryError;
-    let categories: Category[] = [];
+    const products = useSuccessProducts();
+    const categories = useSuccessCategories();
 
     const { backend: backendUrl } = useUrls();
 
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-
-    //  loading  //
-
-    if (productStatus === "loading") {
-        return <h1>商品読み込み中...</h1>
-    }
-    if (categoryStatus === "loading") {
-        return <h1>商品カテゴリー読み込み中...</h1>
-    }
-
-    //  end Loading  //
-
-    if (productStatus === "error") {
-        console.log(productError);
-        productError = ProductData.error;
-        return <h1>商品情報取得エラー</h1>
-    }
-    if (categoryStatus === "error") {
-        console.log(categoryError);
-        return <h1>商品カテゴリー取得エラー</h1>
-    }
-
-    if (productStatus === "success") {
-        products = ProductData.value;
-    }
-    if (categoryStatus === "success") {
-        categories = CategoryData.value;
-    }
 
 
     const handleUpdateCompleted = () => {

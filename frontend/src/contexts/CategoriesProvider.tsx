@@ -1,29 +1,10 @@
 import React from 'react'
 import { CategoriesContext } from './CategoriesContext'
 import type { CategoriesContextType } from '../types/types.context';
-import type { Category } from '../types/types';
 import useCategoryLoader from '../services/useCategoryLoader';
+import { isCategoryArray } from '../validators/category';
 
 function CategoriesProvider({ children }: { children: React.ReactNode }) {
-    const isCategory = (value: unknown): value is Category => {
-        return (
-            typeof value === "object" &&
-            value !== null &&
-            "id" in value &&
-            "name" in value &&
-            "hasProducts" in value &&
-            "products" in value
-        )
-    }
-    const isCategoryArray = (value: unknown): value is Category[] => {
-        if (!Array.isArray(value)) {
-            return false;
-        }
-
-        return value.every(isCategory);
-    }
-
-
     let result: CategoriesContextType;
 
     const data = useCategoryLoader();

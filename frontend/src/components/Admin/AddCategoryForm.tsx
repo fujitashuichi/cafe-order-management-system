@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useUrls } from "../../contexts/UrlContext";
 import type { Category } from "../../types/types";
 import useSuccessCategories from "../../contexts/useSuccessCategories";
 import CategoryBoundary from "../boundary/CategoryBoundary";
+import { CategoryServices } from "../../services/CategoryServices";
 
 function AddCategoryForm() {
     const categories = useSuccessCategories();
+    const categoryService = new CategoryServices();
 
-    const { backend: backendUrl } = useUrls();
     const [inputCategoryName, setInputCategoryName] = useState<Category["name"]>();
 
     const addCategory = async (e: React.FormEvent) => {
@@ -22,23 +22,8 @@ function AddCategoryForm() {
             return;
         };
 
-        try {
-            const response = await fetch(`${backendUrl}/api/categories`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ name: inputCategoryName })
-            });
-
-            if (response.ok) {
-                // reloadCategories();
-                alert("新しいカテゴリーを追加しました");
-                setInputCategoryName("");
-            }
-        }catch (err) {
-            console.error(err);
-        }
+        await categoryService.postCategory(inputCategoryName);
+        window.location.reload();
     };
 
     return (

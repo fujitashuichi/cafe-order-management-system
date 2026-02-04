@@ -1,12 +1,11 @@
 import React, { useState } from 'react'
 import type { Product } from '../../types/types';
-import { useUrls } from '../../contexts/UrlContext';
 import useSuccessCategories from '../../contexts/useSuccessCategories';
+import { ProductServices } from '../../services/ProductServices';
 
 
 function AddProductForm() {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
+    const productService = new ProductServices();
 
     const categories = useSuccessCategories();
 
@@ -22,7 +21,7 @@ function AddProductForm() {
             alert("商品名は必須です");
             return;
         }
-        if (price == "-1") {
+        if (price === null) {
             alert("値段が設定されていません");
             return;
         } else if (price == "0") {
@@ -30,25 +29,8 @@ function AddProductForm() {
             if (!result) return;
         }
 
-        const newProduct = {
-            name: name,
-            price: Number(price),
-            categoryId: categoryId
-        }
-
-        const response = await fetch(`${backendUrl}/api/products`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newProduct)
-        });
-
-        if (response.ok) {
-            alert("商品を登録しました");
-            setName("");
-            setPrice(null);
-        }
+        await productService.postProducts(name, Number(price), categoryId);
+        window.location.reload();
     };
 
     return (

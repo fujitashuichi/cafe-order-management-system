@@ -3,6 +3,10 @@
 
 ### ↓開発ログ
 [dev-log.md](./docs/dev-log.md)
+### ↓整形済み開発ログ
+[dev-log-formatted.md](./docs/dev-log-formatted.md)
+### ↓設計方針
+[design-principles](./docs/desin-principles.md)
 ### ↓要件定義
 [requirement.md](./docs/requirement.md)
 ### ↓データ構造

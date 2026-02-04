@@ -66,7 +66,7 @@
 * **問題発生**: dev時に無限エラー状態（同じfetchエラーが連続）
 * 無限エラーはService層で発生 → Loading失敗後に即座に呼び直されている可能性
 * dev切断後もエラーが長時間流れる → 非同期が大量に溜まっていることを示している可能性
-* Service層でinstanseof Error に引っかかっている → 単純にfetch時のエラー。
+* Service層でinstanceof Error に引っかかっている → 単純にfetch時のエラー。
   ただし、エラー時に即座に再読み込みしているのが最大の問題
 * **修正最優先**: 取得エラー時に即座にリロードしないように制御する
 * 予定(すぐにではない): Service層のBE通信を行うファイルは例外処理に集中させたいため、1層下のLoader層で実行タイミングを計る方針に。
@@ -133,7 +133,7 @@
   ------Loading------ <br />
   status: "idle" | "loading" | "error" | "success" <br />
   ------Provider----- <br />
-  // ここで、JSONを解析し型走査 <br />
+  // ここでデータの整合性を調査
   status: "idle" | "loading" | "error" | "success" <br />
   ------Boundary----- <br />
   \<Loading /> | <></> <br />
@@ -145,3 +145,9 @@
 
 ## 2026-02-04
 * AdminPageのセクションを切り出し、Boundaryの使用を細分化
+* getURL処理をStateHookから純粋関数に変更
+* **訂正**: 未解析のJSONをProviderまで渡しているとしたが、正確にはunknownを渡していて、JSON自体は解析済み
+* 細やかなリファクタリングを実行
+* UrlProviderを排除し、環境変数で扱うことに → 読み込み速度が大きく向上
+* POST/DELETE/PUTもService層に追加。状態更新は全体ロードで施行
+* 無駄なURLプロップを排除し依存関係が明白に

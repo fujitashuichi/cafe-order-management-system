@@ -1,6 +1,5 @@
 import { ProductServices } from './ProductServices';
 import type { LoaderResult } from '../types/types.loader';
-import { useUrls } from '../contexts/UrlContext';
 import { useEffect, useState } from 'react';
 
 
@@ -8,15 +7,12 @@ import { useEffect, useState } from 'react';
 
 
 const useProductLoader = (): LoaderResult<unknown> => {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
-
     const [result, setResult] = useState<LoaderResult<unknown>>({ status: "idle" });
 
     useEffect(() => {
         const load = async () => {
             setResult({ status: "loading" });
-            const service = new ProductServices(`${backendUrl}`);
+            const service = new ProductServices();
             const data = await service.fetchProducts();
 
             if (!data.ok) {

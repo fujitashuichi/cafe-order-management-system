@@ -41,7 +41,7 @@ public class ProductsController : ControllerBase
         } catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
-            return Results.InternalServerError("商品登録失敗: " + ex.Message);
+            return Results.Problem("商品登録失敗: " + ex.Message);
         }
     }
 
@@ -61,7 +61,7 @@ public class ProductsController : ControllerBase
             return Results.NoContent();
         } catch (Exception ex)
         {
-            return Results.InternalServerError("商品の削除に失敗しました" + ex.Message);
+            return Results.Problem("商品の削除に失敗しました" + ex.Message);
         }
     }
 
@@ -81,7 +81,7 @@ public class ProductsController : ControllerBase
             return Results.Ok(product);
         } catch (Exception ex)
         {
-            return Results.InternalServerError(ex.Message);
+            return Results.Problem(ex.Message);
         }
     }
 }

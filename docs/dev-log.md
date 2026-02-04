@@ -142,3 +142,6 @@
   !"success"→Error <br />
   --------UI--------- <br />
   data <br />
+
+## 2026-02-04
+* AdminPageのセクションを切り出し、Boundaryの使用を細分化

@@ -42,7 +42,7 @@ public class CategoriesController : ControllerBase
             return Results.Ok(category);
         } catch (Exception ex)
         {
-            return Results.InternalServerError("カテゴリー名の登録に失敗: " + ex.Message);
+            return Results.Problem("カテゴリー名の登録に失敗: " + ex.Message);
         }
     }
 
@@ -63,7 +63,7 @@ public class CategoriesController : ControllerBase
             return Results.NoContent();
         } catch (Exception ex)
         {
-            return Results.InternalServerError(ex.Message);
+            return Results.Problem(ex.Message);
         }
     }
 }

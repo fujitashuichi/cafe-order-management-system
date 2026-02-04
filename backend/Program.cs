@@ -8,11 +8,11 @@ builder.Services.AddCors(options =>
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin();
-            //.WithOrigins(
-            //    "https://cafe-order-management-system-topaz.vercel.app",
-            //    "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
-            //);
+            .WithOrigins(
+                "http://localhost:5173",
+                "https://cafe-order-management-system-topaz.vercel.app",
+                "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
+            );
     });
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -31,6 +31,8 @@ var app = builder.Build();
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Urls.Add($"http://*:{port}");
+
+app.UseRouting();
 
 app.UseCors();
 

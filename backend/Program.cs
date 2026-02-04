@@ -8,10 +8,11 @@ builder.Services.AddCors(options =>
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithOrigins(
-                "https://cafe-order-management-system-topaz.vercel.app",
-                "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
-            );
+            .AllowAnyOrigin();
+            //.WithOrigins(
+            //    "https://cafe-order-management-system-topaz.vercel.app",
+            //    "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
+            //);
     });
 });
 builder.Services.AddDbContext<AppDbContext>(options =>

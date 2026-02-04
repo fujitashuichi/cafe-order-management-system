@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import type { Product } from '../types/types';
-import { useUrls } from '../contexts/UrlContext';
-import useSuccessCategories from '../contexts/useSuccessCategories';
+import type { Product } from '../../types/types';
+import { useUrls } from '../../contexts/UrlContext';
+import useSuccessCategories from '../../contexts/useSuccessCategories';
+
 
 function AddProductForm() {
     const { backend: backendUrlCtx } = useUrls();

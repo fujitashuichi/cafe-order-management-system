@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { Category, Product } from "../types/types"
-import AppButton from "./common/AppButton";
-import { useUrls } from "../contexts/UrlContext";
+import type { Category, Product } from "../../types/types"
+import AppButton from "../common/AppButton";
+import { useUrls } from "../../contexts/UrlContext";
 
 type EditModalProps = {
     product: Product;

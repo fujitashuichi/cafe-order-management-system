@@ -109,12 +109,12 @@
     これは、進めば進むほど自分の首を絞める設計だと気づいた。
     よってここで、Providerはローディング状態も公開し、Union型も導入する。
 
-  ------Service-------
-  ok: boolean
-  ------Loading-------
-  status: "loading" | "success" | "error"
-  ------Provider------
-  status: "loading" | "success" | "error"
+  ------Service------- <br />
+  ok: boolean <br />
+  ------Loading------- <br />
+  status: "loading" | "success" | "error" <br />
+  ------Provider------ <br />
+  status: "loading" | "success" | "error" <br />
 
   **Loadingが通信状態の意味付けを済ませて、Providerにはデータ検査と配布を任せる**
 * LoaderをHookに変更
@@ -127,17 +127,21 @@
 * validatorsを切り出し、Providerを薄く
 * **タスク**: Boundaryを追加して、success以外を処理させる
 * Boundary → useSuccess → UI の構造が完成。現段階では毎回全体ロードを基本にして改修していく
-  ------Service------
-  ok: boolean
-  ------Loading------
-  status: "idle" | "loading" | "error" | "success"
-  ------Provider-----
-  // ここで、JSONを解析し型走査
-  status: "idle" | "loading" | "error" | "success"
-  ------Boundary-----
-  \<Loading /> | <></>
-  -----useSuccess----
-  "success"→data
-  !"success"→Error
-  --------UI---------
-  data
+
+  ------Service------ <br />
+  ok: boolean <br />
+  ------Loading------ <br />
+  status: "idle" | "loading" | "error" | "success" <br />
+  ------Provider----- <br />
+  // ここで、JSONを解析し型走査 <br />
+  status: "idle" | "loading" | "error" | "success" <br />
+  ------Boundary----- <br />
+  \<Loading /> | <></> <br />
+  -----useSuccess---- <br />
+  "success"→data <br />
+  !"success"→Error <br />
+  --------UI--------- <br />
+  data <br />
+
+## 2026-02-04
+* AdminPageのセクションを切り出し、Boundaryの使用を細分化

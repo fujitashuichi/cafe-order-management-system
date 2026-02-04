@@ -5,7 +5,12 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+        policy
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .WithOrigins(
+                "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
+            );
     });
 });
 builder.Services.AddDbContext<AppDbContext>(options =>

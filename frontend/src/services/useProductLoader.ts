@@ -1,15 +1,14 @@
 import { ProductServices } from './ProductServices';
 import type { LoaderResult } from '../types/types.loader';
-import { useUrls } from '../contexts/UrlContext';
 import { useEffect, useState } from 'react';
+import getBackendUrl from '../env/getBackendUrl';
 
 
 ////////// データ取得エラーはProductServiceで整理済み //////////
 
 
 const useProductLoader = (): LoaderResult<unknown> => {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
+    const backendUrl = getBackendUrl();
 
     const [result, setResult] = useState<LoaderResult<unknown>>({ status: "idle" });
 

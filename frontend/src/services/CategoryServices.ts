@@ -1,19 +1,16 @@
+import getBackendUrl from "../env/getBackendUrl";
 import type { FetchResult } from "../types/common/result.types";
+import type { Category } from "../types/types";
 
 
 /////////////// Service は Error を値として返します
-
+/////////////// ※JSONはunknownで渡るため、Providerで解析する前提です （2026-02-04時点）.
 
 
 export class CategoryServices{
-    private readonly url: string;
+    private readonly url = getBackendUrl();
 
-    constructor (url: string) {
-        this.url = url;
-    }
-
-    fetchCategories = async (): Promise<FetchResult<unknown, Error>> => {
-        // ユーザー相手の処理は止めない
+    fetchCategories = async (): Promise<FetchResult<unknown>> => {
         try {
             const response = await fetch(`${this.url}/api/categories`);
 
@@ -41,7 +38,33 @@ export class CategoryServices{
                 ok: false,
                 error: new Error("unknown error")
             };
+        }
+    }
 
+    postCategory = async (newCategoryName: Category["name"]) => {
+        const response = await fetch(`${this.url}/api/categories/`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ name: newCategoryName })
+            });
+
+        if (!response.ok) {
+            throw new Error("カテゴリー情報を更新できません")
+        }
+    }
+
+    deleteCategory = async (id: Category["id"]) => {
+        const response = await fetch(`${getBackendUrl()}/api/categories/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+        if (!response.ok) {
+            throw new Error("商品カテゴリーの削除に失敗しました")
         }
     }
 }

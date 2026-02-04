@@ -1,12 +1,11 @@
 import useSuccessCategories from "../../contexts/useSuccessCategories"
+import { CategoryServices } from "../../services/CategoryServices";
 import type { Category } from "../../types/types";
 import AppButton from "../common/AppButton";
-import { useUrls } from "../../contexts/UrlContext";
 
 export const CategoriesList = () => {
     const categories = useSuccessCategories();
-
-    const { backend: backendUrl } = useUrls();
+    const categoryService = new CategoryServices();
 
     const deleteCategory = async (e: React.FormEvent, id: Category["id"]) => {
         e.preventDefault();
@@ -19,27 +18,8 @@ export const CategoriesList = () => {
         const result = window.confirm(`本当に${category.name}を削除しますか?`);
         if (!result) return;
 
-        try {
-            const response = await fetch(`${backendUrl}/api/categories/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(id)
-            });
-
-            if (response.status == 400) {
-                alert("商品が紐ずいているため、削除できません");
-            }
-
-            if (response.ok) {
-                alert("正常に削除されました");
-                // reloadCategories();
-            }
-        } catch (err) {
-            alert("商品の削除に失敗しました");
-            console.error("商品の削除に失敗: ", err);
-        }
+        await categoryService.deleteCategory(id);
+        window.location.reload();
     };
 
 

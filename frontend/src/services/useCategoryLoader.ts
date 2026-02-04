@@ -1,6 +1,6 @@
+import getBackendUrl from '../env/getBackendUrl';
 import type { LoaderResult } from '../types/types.loader'
 import { CategoryServices } from './CategoryServices'
-import { useUrls } from '../contexts/urlContext'
 import { useEffect, useState } from 'react';
 
 
@@ -8,8 +8,7 @@ import { useEffect, useState } from 'react';
 
 
 function useCategoryLoader(): LoaderResult<unknown>{
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
+    const backendUrl = getBackendUrl();
 
     const [result, setResult] = useState<LoaderResult<unknown>>({ status: "idle" });
 

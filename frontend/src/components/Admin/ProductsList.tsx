@@ -2,14 +2,15 @@ import useSuccessProducts from "../../contexts/useSuccessProducts"
 import AppButton from "../common/AppButton";
 import type { Product } from "../../types/types";
 import useSuccessCategories from "../../contexts/useSuccessCategories";
-import { useUrls } from "../../contexts/UrlContext";
 import { useState } from "react";
 import EditProductModal from "./EditProductModal";
+import { ProductServices } from "../../services/ProductServices";
 
 
 export const ProductsList = () => {
     const products = useSuccessProducts();
     const categories = useSuccessCategories();
+    const productService = new ProductServices();
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -18,8 +19,6 @@ export const ProductsList = () => {
         setEditingProduct(null);
         alert("更新が完了しました");
     };
-
-    const { backend: backendUrl } = useUrls();
 
     const deleteProduct = async (e: React.FormEvent, id: Product["id"]) => {
         e.preventDefault();
@@ -32,23 +31,8 @@ export const ProductsList = () => {
         const result = window.confirm(`本当に${product.name}を削除しますか?`);
         if (!result) return;
 
-        try {
-            const response = await fetch(`${backendUrl}/api/products/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(id)
-            });
-
-            if (response.ok) {
-                alert("正常に削除されました");
-                // reloadProducts();
-            }
-        } catch (err) {
-            alert("商品の削除に失敗しました");
-            console.error("商品の削除に失敗: ", err);
-        }
+        await productService.deleteProduct(id);
+        window.location.reload();
     };
 
 

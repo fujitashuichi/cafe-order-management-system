@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Category, Product } from "../../types/types"
 import AppButton from "../common/AppButton";
-import { useUrls } from "../../contexts/UrlContext";
+import { ProductServices } from "../../services/ProductServices";
 
 type EditModalProps = {
     product: Product;
@@ -11,9 +11,8 @@ type EditModalProps = {
 }
 
 
-function EditProductModal({ product, categories, onClose, onUpdate }: EditModalProps) {
-    const { backend: backendUrlCtx } = useUrls();
-    const backendUrl = backendUrlCtx.dev;
+function EditProductModal({ product, categories, onClose }: EditModalProps) {
+    const productService =  new ProductServices();
 
     const [name, setName] = useState<Product["name"]>(product.name);
     const [price, setPrice] = useState<Product["price"]>(product.price);
@@ -22,16 +21,8 @@ function EditProductModal({ product, categories, onClose, onUpdate }: EditModalP
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const response = await fetch(`${backendUrl}/api/products/${product.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, price: Number(price), categoryId })
-        });
-
-        if (response.ok) {
-            onUpdate(await response.json());
-            onClose();
-        }
+        await productService.putProduct(product.id, name, price, categoryId);
+        window.location.reload();
     }
 
     return (
@@ -50,7 +41,7 @@ function EditProductModal({ product, categories, onClose, onUpdate }: EditModalP
                     </div>
                     <div>
                         <label htmlFor="category">カテゴリー: </label>
-                        <select className="border border-gray-300 rounded" id="category" name="" onChange={(e) => setCategoryId(parseInt(e.target.value))}>
+                        <select className="border border-gray-300 rounded" id="category" name="" value={categoryId} onChange={(e) => setCategoryId(parseInt(e.target.value))}>
                             {categories.map((item: Category) => { return (<option key={item.id} value={item.id}>{item.name}</option>) })}
                         </select>
                     </div>

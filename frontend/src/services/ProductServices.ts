@@ -1,4 +1,4 @@
-import getBackendUrl from "../env/getBackendUrl";
+import getApiUrl from "../env/getApiUrl";
 import type { FetchResult } from "../types/common/result.types";
 import type { Product } from "../types/types";
 
@@ -8,7 +8,7 @@ import type { Product } from "../types/types";
 
 
 export class ProductServices {
-    private readonly url = getBackendUrl();
+    private readonly url = getApiUrl();
 
     // 情報が欠落していても、Errorを下に渡す → throwはしません.
     fetchProducts = async (): Promise<FetchResult<unknown>> => {

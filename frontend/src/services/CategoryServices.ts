@@ -1,4 +1,4 @@
-import getBackendUrl from "../env/getBackendUrl";
+import getApiUrl from "../env/getApiUrl";
 import type { FetchResult } from "../types/common/result.types";
 import type { Category } from "../types/types";
 
@@ -8,7 +8,7 @@ import type { Category } from "../types/types";
 
 
 export class CategoryServices{
-    private readonly url = getBackendUrl();
+    private readonly url = getApiUrl();
 
     fetchCategories = async (): Promise<FetchResult<unknown>> => {
         try {
@@ -56,7 +56,7 @@ export class CategoryServices{
     }
 
     deleteCategory = async (id: Category["id"]) => {
-        const response = await fetch(`${getBackendUrl()}/api/categories/${id}`, {
+        const response = await fetch(`${this.url}/api/categories/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"

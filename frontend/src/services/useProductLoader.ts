@@ -1,21 +1,18 @@
 import { ProductServices } from './ProductServices';
 import type { LoaderResult } from '../types/types.loader';
 import { useEffect, useState } from 'react';
-import getBackendUrl from '../env/getBackendUrl';
 
 
 ////////// データ取得エラーはProductServiceで整理済み //////////
 
 
 const useProductLoader = (): LoaderResult<unknown> => {
-    const backendUrl = getBackendUrl();
-
     const [result, setResult] = useState<LoaderResult<unknown>>({ status: "idle" });
 
     useEffect(() => {
         const load = async () => {
             setResult({ status: "loading" });
-            const service = new ProductServices(`${backendUrl}`);
+            const service = new ProductServices();
             const data = await service.fetchProducts();
 
             if (!data.ok) {

@@ -1,4 +1,3 @@
-import getBackendUrl from '../env/getBackendUrl';
 import type { LoaderResult } from '../types/types.loader'
 import { CategoryServices } from './CategoryServices'
 import { useEffect, useState } from 'react';
@@ -8,15 +7,13 @@ import { useEffect, useState } from 'react';
 
 
 function useCategoryLoader(): LoaderResult<unknown>{
-    const backendUrl = getBackendUrl();
-
     const [result, setResult] = useState<LoaderResult<unknown>>({ status: "idle" });
 
     useEffect(() => {
         const load = async () => {
             setResult({ status: "loading" });
 
-            const service = new CategoryServices(backendUrl);
+            const service = new CategoryServices();
             const data = await service.fetchCategories();
 
             if (!data.ok) {

@@ -9,6 +9,7 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .WithOrigins(
+                "https://cafe-order-management-system-topaz.vercel.app",
                 "https://cafe-order-management-system-7olf42chn-fujita-shuichis-projects.vercel.app"
             );
     });

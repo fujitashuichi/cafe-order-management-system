@@ -1,6 +1,8 @@
 import getApiUrl from "../env/getApiUrl";
+import { isMocks } from "../env/isMocks";
 import type { FetchResult } from "../types/common/result.types";
 import type { Category } from "../types/types";
+import { CategoriesMock } from "./Mocks";
 
 
 /////////////// Service は Error を値として返します
@@ -12,7 +14,12 @@ export class CategoryServices{
 
     fetchCategories = async (): Promise<FetchResult<unknown>> => {
         try {
-            const response = await fetch(`${this.url}/api/categories`);
+            let response: Response;
+            if (isMocks) {
+                response = await CategoriesMock();
+            } else {
+                response = await fetch(`${this.url}/api/categories`);
+            }
 
             if (!response.ok) {
                 return {

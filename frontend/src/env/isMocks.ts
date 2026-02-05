@@ -1,0 +1,1 @@
+export const isMocks = import.meta.env.VITE_USE_MOCKS?.toLowerCase() === "true";

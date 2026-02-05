@@ -1,6 +1,8 @@
 import getApiUrl from "../env/getApiUrl";
+import { isMocks } from "../env/isMocks";
 import type { FetchResult } from "../types/common/result.types";
 import type { Product } from "../types/types";
+import { ProductsMock } from "./Mocks";
 
 
 /////////////// Service は Error を値として返します
@@ -13,7 +15,13 @@ export class ProductServices {
     // 情報が欠落していても、Errorを下に渡す → throwはしません.
     fetchProducts = async (): Promise<FetchResult<unknown>> => {
         try {
-            const response = await fetch(`${this.url}/api/products`);
+            let response: Response;
+            if (isMocks) {
+                response = await ProductsMock();
+            } else {
+                response = await fetch(`${this.url}/api/products`);
+            }
+
             if (!response.ok) {
                 return {
                     ok: false,
